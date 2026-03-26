@@ -134,15 +134,6 @@ public static function infolist(Infolist $infolist): Infolist
 <tr>
 <td width="50%" valign="top">
 
-### FilaForms
-[<img src="https://filaforms.app/img/og-image.png" width="100%" />](https://filaforms.app/)
-
-Visual form builder for all your public-facing forms.
-[Learn more ->](https://filaforms.app)
-
-</td>
-<td width="50%" valign="top">
-
 ### Custom Fields
 [<img src="https://github.com/Relaticle/custom-fields/raw/2.x/art/preview.png" width="100%" />](https://relaticle.github.io/custom-fields)
 
@@ -150,8 +141,6 @@ Let users add custom fields to any model without code changes.
 [Learn more ->](https://relaticle.github.io/custom-fields)
 
 </td>
-</tr>
-<tr>
 <td width="50%" valign="top">
 
 ### Flowforge
@@ -160,8 +149,6 @@ Let users add custom fields to any model without code changes.
 Transform any Laravel model into a drag-and-drop Kanban board.
 [Learn more ->](https://relaticle.github.io/flowforge)
 
-</td>
-<td width="50%" valign="top">
 </td>
 </tr>
 </table>
