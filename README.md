@@ -135,7 +135,7 @@ public static function infolist(Infolist $infolist): Infolist
 <td width="50%" valign="top">
 
 ### Custom Fields
-[<img src="https://github.com/Relaticle/custom-fields/raw/2.x/art/preview.png" width="100%" />](https://relaticle.github.io/custom-fields)
+[<img src="https://github.com/Relaticle/custom-fields/raw/3.x/art/preview.png" width="100%" />](https://relaticle.github.io/custom-fields)
 
 Let users add custom fields to any model without code changes.
 [Learn more ->](https://relaticle.github.io/custom-fields)
