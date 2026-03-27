@@ -2,6 +2,8 @@
 
 namespace Relaticle\Comments\Models;
 
+use Filament\Forms\Components\RichEditor\MentionProvider;
+use Filament\Forms\Components\RichEditor\RichContentRenderer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -145,6 +147,19 @@ class Comment extends Model
     public function renderBodyWithMentions(): string
     {
         $body = $this->body;
+
+        if ($this->hasRichEditorMentions($body)) {
+            return RichContentRenderer::make($body)
+                ->mentions([
+                    MentionProvider::make('@')
+                        ->getLabelsUsing(fn (array $ids): array => CommentsConfig::getCommenterModel()::query()
+                            ->whereIn('id', $ids)
+                            ->pluck('name', 'id')
+                            ->all()),
+                ])
+                ->toHtml();
+        }
+
         $mentionNames = $this->mentions->pluck('name')->filter()->unique();
 
         foreach ($mentionNames as $name) {
@@ -156,5 +171,10 @@ class Comment extends Model
         }
 
         return $body;
+    }
+
+    protected function hasRichEditorMentions(string $body): bool
+    {
+        return str_contains($body, 'data-type="mention"') || str_contains($body, '<p>') || str_contains($body, '<br');
     }
 }

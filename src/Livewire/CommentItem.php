@@ -2,20 +2,24 @@
 
 namespace Relaticle\Comments\Livewire;
 
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Relaticle\Comments\CommentsConfig;
-use Relaticle\Comments\Contracts\MentionResolver;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Events\CommentDeleted;
 use Relaticle\Comments\Events\CommentUpdated;
 use Relaticle\Comments\Mentions\MentionParser;
 use Relaticle\Comments\Models\Comment;
 
-class CommentItem extends Component
+class CommentItem extends Component implements HasForms
 {
+    use InteractsWithForms;
     use WithFileUploads;
 
     public Comment $comment;
@@ -24,9 +28,11 @@ class CommentItem extends Component
 
     public bool $isReplying = false;
 
-    public string $editBody = '';
+    /** @var array<string, mixed> */
+    public ?array $editData = [];
 
-    public string $replyBody = '';
+    /** @var array<string, mixed> */
+    public ?array $replyData = [];
 
     /** @var array<int, TemporaryUploadedFile> */
     public array $replyAttachments = [];
@@ -36,30 +42,60 @@ class CommentItem extends Component
         $this->comment = $comment;
     }
 
+    public function editForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                RichEditor::make('body')
+                    ->hiddenLabel()
+                    ->required()
+                    ->placeholder(__('Edit your comment...'))
+                    ->toolbarButtons(CommentsConfig::getEditorToolbar())
+                    ->mentions([
+                        CommentsConfig::makeMentionProvider(),
+                    ]),
+            ])
+            ->statePath('editData');
+    }
+
+    public function replyForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                RichEditor::make('body')
+                    ->hiddenLabel()
+                    ->required()
+                    ->placeholder(__('Write a reply...'))
+                    ->toolbarButtons(CommentsConfig::getEditorToolbar())
+                    ->mentions([
+                        CommentsConfig::makeMentionProvider(),
+                    ]),
+            ])
+            ->statePath('replyData');
+    }
+
     public function startEdit(): void
     {
         $this->authorize('update', $this->comment);
 
         $this->isEditing = true;
-        $this->editBody = $this->comment->body;
+        $this->editForm->fill(['body' => $this->comment->body]);
     }
 
     public function cancelEdit(): void
     {
         $this->isEditing = false;
-        $this->editBody = '';
+        $this->editForm->fill();
     }
 
     public function saveEdit(): void
     {
         $this->authorize('update', $this->comment);
 
-        $this->validate([
-            'editBody' => ['required', 'string', 'min:1'],
-        ]);
+        $data = $this->editForm->getState();
 
         $this->comment->update([
-            'body' => $this->editBody,
+            'body' => $data['body'] ?? '',
             'edited_at' => now(),
         ]);
 
@@ -70,7 +106,7 @@ class CommentItem extends Component
         $this->dispatch('commentUpdated');
 
         $this->isEditing = false;
-        $this->editBody = '';
+        $this->editForm->fill();
     }
 
     public function deleteComment(): void
@@ -91,12 +127,13 @@ class CommentItem extends Component
         }
 
         $this->isReplying = true;
+        $this->replyForm->fill();
     }
 
     public function cancelReply(): void
     {
         $this->isReplying = false;
-        $this->replyBody = '';
+        $this->replyForm->fill();
         $this->replyAttachments = [];
     }
 
@@ -104,20 +141,20 @@ class CommentItem extends Component
     {
         $this->authorize('reply', $this->comment);
 
-        $rules = ['replyBody' => ['required', 'string', 'min:1']];
+        $data = $this->replyForm->getState();
 
         if (CommentsConfig::areAttachmentsEnabled()) {
             $maxSize = CommentsConfig::getAttachmentMaxSize();
             $allowedTypes = implode(',', CommentsConfig::getAttachmentAllowedTypes());
-            $rules['replyAttachments.*'] = ['nullable', 'file', "max:{$maxSize}", "mimetypes:{$allowedTypes}"];
+            $this->validate([
+                'replyAttachments.*' => ['nullable', 'file', "max:{$maxSize}", "mimetypes:{$allowedTypes}"],
+            ]);
         }
-
-        $this->validate($rules);
 
         $user = CommentsConfig::resolveAuthenticatedUser();
 
         $reply = $this->comment->commentable->comments()->create([
-            'body' => $this->replyBody,
+            'body' => $data['body'] ?? '',
             'parent_id' => $this->comment->id,
             'commenter_id' => $user->getKey(),
             'commenter_type' => $user->getMorphClass(),
@@ -146,7 +183,7 @@ class CommentItem extends Component
         $this->dispatch('commentUpdated');
 
         $this->isReplying = false;
-        $this->replyBody = '';
+        $this->replyForm->fill();
         $this->replyAttachments = [];
     }
 
@@ -155,25 +192,6 @@ class CommentItem extends Component
         $attachments = $this->replyAttachments;
         unset($attachments[$index]);
         $this->replyAttachments = array_values($attachments);
-    }
-
-    /** @return array<int, array{id: int, name: string, avatar_url: ?string}> */
-    public function searchUsers(string $query): array
-    {
-        if (mb_strlen($query) < 1) {
-            return [];
-        }
-
-        $resolver = app(MentionResolver::class);
-
-        return $resolver->search($query)
-            ->map(fn ($user) => [
-                'id' => $user->getKey(),
-                'name' => $user->getCommentDisplayName(),
-                'avatar_url' => $user->getCommentAvatarUrl(),
-            ])
-            ->values()
-            ->all();
     }
 
     public function render(): View

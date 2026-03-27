@@ -2,6 +2,10 @@
 
 namespace Relaticle\Comments\Livewire;
 
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -10,19 +14,20 @@ use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Relaticle\Comments\CommentsConfig;
-use Relaticle\Comments\Contracts\MentionResolver;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Mentions\MentionParser;
 use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Models\Subscription;
 
-class Comments extends Component
+class Comments extends Component implements HasForms
 {
+    use InteractsWithForms;
     use WithFileUploads;
 
     public Model $model;
 
-    public string $newComment = '';
+    /** @var array<string, mixed> */
+    public ?array $commentData = [];
 
     public string $sortDirection = 'asc';
 
@@ -38,6 +43,23 @@ class Comments extends Component
         $this->model = $model;
         $this->perPage = CommentsConfig::getPerPage();
         $this->loadedCount = $this->perPage;
+        $this->commentForm->fill();
+    }
+
+    public function commentForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                RichEditor::make('body')
+                    ->hiddenLabel()
+                    ->required()
+                    ->placeholder(__('Write a comment...'))
+                    ->toolbarButtons(CommentsConfig::getEditorToolbar())
+                    ->mentions([
+                        CommentsConfig::makeMentionProvider(),
+                    ]),
+            ])
+            ->statePath('commentData');
     }
 
     /** @return Collection<int, Comment> */
@@ -95,22 +117,22 @@ class Comments extends Component
 
     public function addComment(): void
     {
-        $rules = ['newComment' => ['required', 'string', 'min:1']];
+        $data = $this->commentForm->getState();
 
         if (CommentsConfig::areAttachmentsEnabled()) {
             $maxSize = CommentsConfig::getAttachmentMaxSize();
             $allowedTypes = implode(',', CommentsConfig::getAttachmentAllowedTypes());
-            $rules['attachments.*'] = ['nullable', 'file', "max:{$maxSize}", "mimetypes:{$allowedTypes}"];
+            $this->validate([
+                'attachments.*' => ['nullable', 'file', "max:{$maxSize}", "mimetypes:{$allowedTypes}"],
+            ]);
         }
-
-        $this->validate($rules);
 
         $this->authorize('create', CommentsConfig::getCommentModel());
 
         $user = CommentsConfig::resolveAuthenticatedUser();
 
         $comment = $this->model->comments()->create([
-            'body' => $this->newComment,
+            'body' => $data['body'] ?? '',
             'commenter_id' => $user->getKey(),
             'commenter_type' => $user->getMorphClass(),
         ]);
@@ -135,7 +157,8 @@ class Comments extends Component
 
         app(MentionParser::class)->syncMentions($comment);
 
-        $this->reset('newComment', 'attachments');
+        $this->commentForm->fill();
+        $this->reset('attachments');
     }
 
     public function removeAttachment(int $index): void
@@ -181,25 +204,6 @@ class Comments extends Component
     public function refreshComments(): void
     {
         unset($this->comments, $this->totalCount, $this->hasMore);
-    }
-
-    /** @return array<int, array{id: int, name: string, avatar_url: ?string}> */
-    public function searchUsers(string $query): array
-    {
-        if (mb_strlen($query) < 1) {
-            return [];
-        }
-
-        $resolver = app(MentionResolver::class);
-
-        return $resolver->search($query)
-            ->map(fn ($user) => [
-                'id' => $user->getKey(),
-                'name' => $user->getCommentDisplayName(),
-                'avatar_url' => $user->getCommentAvatarUrl(),
-            ])
-            ->values()
-            ->all();
     }
 
     public function render(): View

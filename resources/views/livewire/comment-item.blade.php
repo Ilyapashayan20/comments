@@ -33,14 +33,7 @@
             {{-- Body or edit form --}}
             @if ($isEditing)
                 <form wire:submit="saveEdit" class="mt-1">
-                    <x-filament::input.wrapper>
-                        <textarea wire:model="editBody" rows="3"
-                            class="block w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 dark:text-white dark:placeholder:text-gray-500"
-                        ></textarea>
-                    </x-filament::input.wrapper>
-                    @error('editBody')
-                        <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
-                    @enderror
+                    {{ $this->editForm }}
                     <div class="mt-2 flex gap-2">
                         <button type="submit" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Save</button>
                         <button type="button" wire:click="cancelEdit" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
@@ -111,98 +104,8 @@
 
         {{-- Reply form --}}
         @if ($isReplying)
-            <form wire:submit="addReply" class="relative mt-3"
-                x-data="{
-                    showMentions: false,
-                    mentionQuery: '',
-                    mentionResults: [],
-                    selectedIndex: 0,
-                    mentionStart: null,
-                    async handleInput(event) {
-                        const textarea = event.target;
-                        const value = textarea.value;
-                        const cursorPos = textarea.selectionStart;
-                        const textBeforeCursor = value.substring(0, cursorPos);
-                        const atIndex = textBeforeCursor.lastIndexOf('@');
-                        if (atIndex !== -1 && (atIndex === 0 || textBeforeCursor[atIndex - 1] === ' ' || textBeforeCursor[atIndex - 1] === '\n')) {
-                            const query = textBeforeCursor.substring(atIndex + 1);
-                            if (query.length > 0 && !query.includes(' ')) {
-                                this.mentionStart = atIndex;
-                                this.mentionQuery = query;
-                                this.mentionResults = await $wire.searchUsers(query);
-                                this.showMentions = this.mentionResults.length > 0;
-                                this.selectedIndex = 0;
-                                return;
-                            }
-                        }
-                        this.showMentions = false;
-                    },
-                    handleKeydown(event) {
-                        if (!this.showMentions) return;
-                        if (event.key === 'ArrowDown') {
-                            event.preventDefault();
-                            this.selectedIndex = Math.min(this.selectedIndex + 1, this.mentionResults.length - 1);
-                        } else if (event.key === 'ArrowUp') {
-                            event.preventDefault();
-                            this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
-                        } else if (event.key === 'Enter' || event.key === 'Tab') {
-                            if (this.mentionResults.length > 0) {
-                                event.preventDefault();
-                                this.selectMention(this.mentionResults[this.selectedIndex]);
-                            }
-                        } else if (event.key === 'Escape') {
-                            this.showMentions = false;
-                        }
-                    },
-                    selectMention(user) {
-                        const textarea = this.$refs.replyInput;
-                        const value = textarea.value;
-                        const before = value.substring(0, this.mentionStart);
-                        const after = value.substring(textarea.selectionStart);
-                        const newValue = before + '@' + user.name + ' ' + after;
-                        $wire.set('replyBody', newValue);
-                        this.showMentions = false;
-                        this.$nextTick(() => {
-                            const pos = before.length + user.name.length + 2;
-                            textarea.focus();
-                            textarea.setSelectionRange(pos, pos);
-                        });
-                    }
-                }">
-                <x-filament::input.wrapper>
-                    <textarea x-ref="replyInput"
-                        wire:model="replyBody"
-                        @input="handleInput($event)"
-                        @keydown="handleKeydown($event)"
-                        rows="2"
-                        placeholder="Write a reply..."
-                        class="block w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 dark:text-white dark:placeholder:text-gray-500"
-                    ></textarea>
-                </x-filament::input.wrapper>
-
-                {{-- Mention autocomplete dropdown --}}
-                <div x-show="showMentions" x-cloak
-                    class="absolute z-50 mt-1 w-64 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
-                    <template x-for="(user, index) in mentionResults" :key="user.id">
-                        <button type="button"
-                            @click="selectMention(user)"
-                            :class="{ 'bg-primary-50 dark:bg-primary-900/20': index === selectedIndex }"
-                            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <template x-if="user.avatar_url">
-                                <img :src="user.avatar_url" class="h-6 w-6 rounded-full object-cover" />
-                            </template>
-                            <template x-if="!user.avatar_url">
-                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-xs font-medium text-primary-700 dark:bg-primary-800 dark:text-primary-300"
-                                    x-text="user.name.charAt(0).toUpperCase()"></div>
-                            </template>
-                            <span x-text="user.name" class="text-gray-900 dark:text-gray-100"></span>
-                        </button>
-                    </template>
-                </div>
-
-                @error('replyBody')
-                    <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
-                @enderror
+            <form wire:submit="addReply" class="mt-3">
+                {{ $this->replyForm }}
 
                 @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
                     <div class="mt-2">

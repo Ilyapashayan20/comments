@@ -4,6 +4,7 @@ namespace Relaticle\Comments;
 
 use App\Models\User;
 use Closure;
+use Filament\Forms\Components\RichEditor\MentionProvider;
 use Relaticle\Comments\Mentions\DefaultMentionResolver;
 use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Policies\CommentPolicy;
@@ -172,5 +173,20 @@ class CommentsConfig
     public static function resolveAuthenticatedUserUsing(Closure $callback): void
     {
         static::$resolveAuthenticatedUser = $callback;
+    }
+
+    public static function makeMentionProvider(): MentionProvider
+    {
+        return MentionProvider::make('@')
+            ->getSearchResultsUsing(fn (string $search): array => static::getCommenterModel()::query()
+                ->where('name', 'like', "%{$search}%")
+                ->orderBy('name')
+                ->limit(static::getMentionMaxResults())
+                ->pluck('name', 'id')
+                ->all())
+            ->getLabelsUsing(fn (array $ids): array => static::getCommenterModel()::query()
+                ->whereIn('id', $ids)
+                ->pluck('name', 'id')
+                ->all());
     }
 }
