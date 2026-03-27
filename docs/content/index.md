@@ -37,12 +37,14 @@ Drop-in integration with any Filament resource.
   :::
 ::
 
-::callout{icon="i-lucide-triangle-alert" color="amber"}
-**Alpha Software** -- This package is currently in alpha. The API is not stable and breaking changes may occur between releases without prior notice. Do not use in production unless you are prepared to handle upgrades manually.
-::
+<div class="text-center max-w-5xl mx-auto">
+  <div class="aspect-video rounded-lg shadow-lg overflow-hidden">
+    <img src="/preview.png" alt="Comments - threaded discussions in Filament" class="w-full h-full object-cover object-top" />
+  </div>
+</div>
 
-<div class="max-w-5xl mx-auto mt-8">
-  <img src="/preview.png" alt="Comments - threaded discussions in Filament" class="rounded-lg shadow-lg w-full" />
+<div class="text-center mt-4 text-sm text-amber-600 dark:text-amber-400">
+  <strong>Alpha Software</strong> — Breaking changes may occur between releases. Not recommended for production use.
 </div>
 
 ::u-page-section
