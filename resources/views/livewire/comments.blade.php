@@ -57,10 +57,10 @@
         </div>
     @endif
 
-    {{-- New comment form - only for authorized users --}}
+    {{-- New comment form - sticky at bottom of slide-over --}}
     @auth
         @can('create', \Relaticle\Comments\CommentsConfig::getCommentModel())
-            <div class="mt-4">
+            <div class="sticky bottom-0 z-10 -mx-4 -mb-4 border-t border-gray-200 bg-white px-4 pb-4 pt-3 dark:border-gray-700 dark:bg-gray-900">
                 {{ $this->commentForm }}
 
                 @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
