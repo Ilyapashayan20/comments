@@ -36,7 +36,8 @@ class CommentsAction extends Action
                 $count = $record->commentCount();
 
                 return $count > 0 ? $count : null;
-            });
+            })
+            ->badgeColor('gray');
     }
 
     public static function getDefaultName(): ?string
