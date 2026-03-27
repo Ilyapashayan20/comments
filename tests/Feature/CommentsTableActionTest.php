@@ -17,10 +17,11 @@ it('configures as a slide-over', function () {
     expect($action->isModalSlideOver())->toBeTrue();
 });
 
-it('has modal content configured', function () {
+it('disables modal submit and cancel actions', function () {
     $action = CommentsTableAction::make('comments');
 
-    expect($action->hasModalContent())->toBeTrue();
+    expect($action->getModalSubmitAction())->toBeFalsy()
+        ->and($action->getModalCancelAction())->toBeFalsy();
 });
 
 it('shows badge with comment count for the record', function () {

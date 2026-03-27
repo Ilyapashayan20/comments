@@ -3,8 +3,8 @@
 namespace Relaticle\Comments\Filament\Actions;
 
 use Filament\Actions\Action;
-use Illuminate\Contracts\View\View;
 use Relaticle\Comments\Concerns\HasComments;
+use Relaticle\Comments\Filament\Infolists\Components\CommentsEntry;
 
 class CommentsAction extends Action
 {
@@ -19,11 +19,9 @@ class CommentsAction extends Action
             ->modalHeading(__('Comments'))
             ->modalSubmitAction(false)
             ->modalCancelAction(false)
-            ->modalContent(function (): View {
-                return view('comments::filament.comments-action', [
-                    'record' => $this->getRecord(),
-                ]);
-            })
+            ->schema([
+                CommentsEntry::make('comments'),
+            ])
             ->badge(function (): ?int {
                 $record = $this->getRecord();
 

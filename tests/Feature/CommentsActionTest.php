@@ -29,10 +29,11 @@ it('has a chat bubble icon', function () {
     expect($action->getIcon())->toBe('heroicon-o-chat-bubble-left-right');
 });
 
-it('has modal content configured', function () {
+it('disables modal submit and cancel actions', function () {
     $action = CommentsAction::make('comments');
 
-    expect($action->hasModalContent())->toBeTrue();
+    expect($action->getModalSubmitAction())->toBeFalsy()
+        ->and($action->getModalCancelAction())->toBeFalsy();
 });
 
 it('shows badge with comment count when comments exist', function () {
