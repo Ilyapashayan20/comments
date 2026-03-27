@@ -2,7 +2,10 @@
 
 namespace Relaticle\Comments\Tests;
 
+use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
+use Filament\Forms\FormsServiceProvider;
+use Filament\Schemas\SchemasServiceProvider;
 use Filament\Support\SupportServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -27,6 +30,9 @@ abstract class TestCase extends Orchestra
         return [
             LivewireServiceProvider::class,
             SupportServiceProvider::class,
+            SchemasServiceProvider::class,
+            FormsServiceProvider::class,
+            ActionsServiceProvider::class,
             FilamentServiceProvider::class,
             CommentsServiceProvider::class,
         ];
