@@ -137,15 +137,5 @@ Extend your Laravel applications with our ecosystem of complementary tools
     ---
     Let users add custom fields to any model without code changes.
     :::
-
-    :::card
-    ---
-    title: Flowforge
-    icon: i-lucide-kanban
-    to: https://relaticle.github.io/flowforge
-    target: _blank
-    ---
-    Transform any Laravel model into a drag-and-drop Kanban board.
-    :::
   ::
 ::
