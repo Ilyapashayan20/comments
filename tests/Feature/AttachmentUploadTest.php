@@ -217,7 +217,7 @@ it('hides upload UI when attachments disabled', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->assertDontSeeHtml('Attach files');
+        ->assertDontSeeHtml('wire:model="attachments"');
 });
 
 it('shows upload UI when attachments enabled', function () {
@@ -227,7 +227,7 @@ it('shows upload UI when attachments enabled', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->assertSeeHtml('Attach files');
+        ->assertSeeHtml('wire:model="attachments"');
 });
 
 it('creates comment with multiple file attachments', function () {

@@ -34,9 +34,9 @@
             @if ($isEditing)
                 <div class="mt-1">
                     {{ $this->editForm }}
-                    <div class="mt-2 flex gap-2">
+                    <div class="mt-2 flex items-center justify-between">
+                        <button type="button" wire:click="cancelEdit" class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
                         <button type="button" wire:click="saveEdit" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Save</button>
-                        <button type="button" wire:click="cancelEdit" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
                     </div>
                 </div>
             @else
@@ -107,36 +107,35 @@
             <div class="mt-3">
                 {{ $this->replyForm }}
 
-                @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
-                    <div class="mt-2">
-                        <label class="flex cursor-pointer items-center gap-2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-                            </svg>
-                            Attach files
-                            <input type="file" wire:model="replyAttachments" multiple class="hidden" accept="{{ implode(',', \Relaticle\Comments\CommentsConfig::getAttachmentAllowedTypes()) }}" />
-                        </label>
+                @if (!empty($replyAttachments))
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        @foreach ($replyAttachments as $index => $file)
+                            <div class="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                <span>{{ $file->getClientOriginalName() }}</span>
+                                <button type="button" wire:click="removeReplyAttachment({{ $index }})" class="text-gray-400 hover:text-danger-500 dark:text-gray-500 dark:hover:text-danger-400">&times;</button>
+                            </div>
+                        @endforeach
                     </div>
-
-                    @if (!empty($replyAttachments))
-                        <div class="mt-2 flex flex-wrap gap-2">
-                            @foreach ($replyAttachments as $index => $file)
-                                <div class="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                                    <span>{{ $file->getClientOriginalName() }}</span>
-                                    <button type="button" wire:click="removeReplyAttachment({{ $index }})" class="text-gray-400 hover:text-danger-500 dark:text-gray-500 dark:hover:text-danger-400">&times;</button>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
 
                     @error('replyAttachments.*')
                         <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                     @enderror
                 @endif
 
-                <div class="mt-2 flex gap-2">
+                <div class="mt-2 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
+                            <label class="flex cursor-pointer items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+                                </svg>
+                                Attach
+                                <input type="file" wire:model="replyAttachments" multiple class="hidden" accept="{{ implode(',', \Relaticle\Comments\CommentsConfig::getAttachmentAllowedTypes()) }}" />
+                            </label>
+                        @endif
+                        <button type="button" wire:click="cancelReply" class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
+                    </div>
                     <button type="button" wire:click="addReply" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Reply</button>
-                    <button type="button" wire:click="cancelReply" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
                 </div>
             </div>
         @endif

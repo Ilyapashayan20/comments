@@ -63,34 +63,34 @@
             <div class="sticky bottom-0 z-10 -mx-4 -mb-4 border-t border-gray-200 bg-white px-4 pb-4 pt-3 dark:border-gray-700 dark:bg-gray-900">
                 {{ $this->commentForm }}
 
-                @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
-                    <div class="mt-2">
-                        <label class="flex cursor-pointer items-center gap-2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-                            </svg>
-                            Attach files
-                            <input type="file" wire:model="attachments" multiple class="hidden" accept="{{ implode(',', \Relaticle\Comments\CommentsConfig::getAttachmentAllowedTypes()) }}" />
-                        </label>
+                @if (!empty($attachments))
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        @foreach ($attachments as $index => $file)
+                            <div class="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                <span>{{ $file->getClientOriginalName() }}</span>
+                                <button type="button" wire:click="removeAttachment({{ $index }})" class="text-gray-400 hover:text-danger-500 dark:text-gray-500 dark:hover:text-danger-400">&times;</button>
+                            </div>
+                        @endforeach
                     </div>
-
-                    @if (!empty($attachments))
-                        <div class="mt-2 flex flex-wrap gap-2">
-                            @foreach ($attachments as $index => $file)
-                                <div class="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                                    <span>{{ $file->getClientOriginalName() }}</span>
-                                    <button type="button" wire:click="removeAttachment({{ $index }})" class="text-gray-400 hover:text-danger-500 dark:text-gray-500 dark:hover:text-danger-400">&times;</button>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
 
                     @error('attachments.*')
                         <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                     @enderror
                 @endif
 
-                <div class="mt-2 flex justify-end">
+                <div class="mt-2 flex items-center justify-between">
+                    @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
+                        <label class="flex cursor-pointer items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+                            </svg>
+                            Attach
+                            <input type="file" wire:model="attachments" multiple class="hidden" accept="{{ implode(',', \Relaticle\Comments\CommentsConfig::getAttachmentAllowedTypes()) }}" />
+                        </label>
+                    @else
+                        <div></div>
+                    @endif
+
                     <button type="button" wire:click="addComment"
                         class="inline-flex items-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-500 dark:hover:bg-primary-400 dark:focus:ring-offset-gray-800"
                         wire:loading.attr="disabled" wire:target="addComment">
