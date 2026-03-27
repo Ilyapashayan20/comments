@@ -130,15 +130,12 @@ class Comment extends Model
     public function depth(): int
     {
         $depth = 0;
-        $comment = $this;
+        $maxDepth = CommentsConfig::getMaxDepth();
+        $parentId = $this->parent_id;
 
-        while ($comment->parent_id !== null) {
-            $comment = $comment->parent;
+        while ($parentId !== null && $depth < $maxDepth) {
             $depth++;
-
-            if ($depth >= CommentsConfig::getMaxDepth()) {
-                return CommentsConfig::getMaxDepth();
-            }
+            $parentId = static::where('id', $parentId)->value('parent_id');
         }
 
         return $depth;
