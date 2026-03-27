@@ -1,10 +1,10 @@
 <?php
 
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Livewire\CommentItem;
 use Relaticle\Comments\Livewire\Comments;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -35,8 +35,8 @@ it('pre-fills editBody with existing comment HTML when starting edit', function 
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => $originalHtml,
     ]);
 
@@ -54,8 +54,8 @@ it('saves edited HTML content through edit form', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Original</p>',
     ]);
 
@@ -81,8 +81,8 @@ it('creates reply with rich HTML content', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -108,8 +108,8 @@ it('renders comment body with fi-prose class', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Styled comment</p>',
     ]);
 
@@ -120,7 +120,7 @@ it('renders comment body with fi-prose class', function () {
 });
 
 it('returns editor toolbar configuration as nested array', function () {
-    $toolbar = Config::getEditorToolbar();
+    $toolbar = CommentsConfig::getEditorToolbar();
 
     expect($toolbar)->toBeArray();
     expect($toolbar)->not->toBeEmpty();
@@ -134,7 +134,7 @@ it('uses custom toolbar config when overridden', function () {
         ['bold', 'italic'],
     ]]);
 
-    $toolbar = Config::getEditorToolbar();
+    $toolbar = CommentsConfig::getEditorToolbar();
 
     expect($toolbar)->toHaveCount(1);
     expect($toolbar[0])->toBe(['bold', 'italic']);

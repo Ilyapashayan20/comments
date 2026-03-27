@@ -2,12 +2,12 @@
 
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Events\CommentDeleted;
 use Relaticle\Comments\Events\CommentUpdated;
 use Relaticle\Comments\Livewire\CommentItem;
 use Relaticle\Comments\Livewire\Comments;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -38,8 +38,8 @@ it('fires CommentUpdated event when editing a comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Original</p>',
     ]);
 
@@ -64,8 +64,8 @@ it('fires CommentDeleted event when deleting a comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -87,8 +87,8 @@ it('fires CommentCreated event when adding a reply', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -119,6 +119,6 @@ it('carries correct comment and commentable in event payload', function () {
     Event::assertDispatched(CommentCreated::class, function (CommentCreated $event) use ($post, $user) {
         return $event->comment instanceof Comment
             && $event->commentable->id === $post->id
-            && $event->comment->user_id === $user->id;
+            && $event->comment->commenter_id === $user->id;
     });
 });

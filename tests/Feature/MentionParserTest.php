@@ -2,11 +2,11 @@
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Contracts\MentionResolver;
 use Relaticle\Comments\Events\UserMentioned;
 use Relaticle\Comments\Mentions\DefaultMentionResolver;
 use Relaticle\Comments\Mentions\MentionParser;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -62,8 +62,8 @@ it('stores mentions in comment_mentions table on create', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Hello @john and @jane</p>',
     ]);
 
@@ -85,8 +85,8 @@ it('dispatches UserMentioned event for each mentioned user', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Hello @john and @jane</p>',
     ]);
 
@@ -116,8 +116,8 @@ it('only dispatches UserMentioned for newly added mentions on update', function 
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Hello @john</p>',
     ]);
 
@@ -146,8 +146,8 @@ it('removes mentions from pivot when user removed from body', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Hello @john and @jane</p>',
     ]);
 

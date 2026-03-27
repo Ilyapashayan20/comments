@@ -2,13 +2,13 @@
 
 namespace Relaticle\Comments\Contracts;
 
-interface Commenter
+interface Commentator
 {
     public function getKey();
 
     public function getMorphClass();
 
-    public function getCommentName(): string;
+    public function getCommentDisplayName(): string;
 
     public function getCommentAvatarUrl(): ?string;
 }

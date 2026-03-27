@@ -5,9 +5,10 @@ namespace Relaticle\Comments;
 use App\Models\User;
 use Closure;
 use Relaticle\Comments\Mentions\DefaultMentionResolver;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Policies\CommentPolicy;
 
-class Config
+class CommentsConfig
 {
     protected static ?Closure $resolveAuthenticatedUser = null;
 
@@ -23,7 +24,25 @@ class Config
 
     public static function getCommentTable(): string
     {
-        return config('comments.tables.comments', 'comments');
+        return static::getTableName('comments');
+    }
+
+    public static function getTableName(string $table): string
+    {
+        $defaults = [
+            'comments' => 'comments',
+            'reactions' => 'comment_reactions',
+            'mentions' => 'comment_mentions',
+            'subscriptions' => 'comment_subscriptions',
+            'attachments' => 'comment_attachments',
+        ];
+
+        return config("comments.table_names.{$table}", $defaults[$table] ?? $table);
+    }
+
+    public static function getCommenterMorphName(): string
+    {
+        return config('comments.column_names.commenter_morph', 'commenter');
     }
 
     public static function getMaxDepth(): int

@@ -8,13 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create(config('comments.tables.comments', 'comments'), function (Blueprint $table) {
+        Schema::create(config('comments.table_names.comments', 'comments'), function (Blueprint $table) {
             $table->id();
             $table->morphs('commentable');
-            $table->morphs('user');
+            $table->morphs('commenter');
             $table->foreignId('parent_id')
                 ->nullable()
-                ->constrained(config('comments.tables.comments', 'comments'))
+                ->constrained(config('comments.table_names.comments', 'comments'))
                 ->cascadeOnDelete();
             $table->text('body');
             $table->timestamp('edited_at')->nullable();

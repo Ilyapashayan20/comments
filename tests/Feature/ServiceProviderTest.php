@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
+use Relaticle\Comments\Models\Comment;
 
 it('registers the config file', function () {
     expect(config('comments'))->toBeArray();
@@ -11,15 +11,15 @@ it('registers the config file', function () {
 });
 
 it('resolves the comment model from config', function () {
-    expect(Config::getCommentModel())->toBe(Comment::class);
+    expect(CommentsConfig::getCommentModel())->toBe(Comment::class);
 });
 
 it('resolves the comment table from config', function () {
-    expect(Config::getCommentTable())->toBe('comments');
+    expect(CommentsConfig::getCommentTable())->toBe('comments');
 });
 
 it('resolves max depth from config', function () {
-    expect(Config::getMaxDepth())->toBe(2);
+    expect(CommentsConfig::getMaxDepth())->toBe(2);
 });
 
 it('registers the morph map for comment', function () {
@@ -32,7 +32,7 @@ it('creates the comments table via migration', function () {
     expect(Schema::hasTable('comments'))->toBeTrue();
     expect(Schema::hasColumns('comments', [
         'id', 'commentable_type', 'commentable_id',
-        'user_type', 'user_id', 'parent_id', 'body',
+        'commenter_type', 'commenter_id', 'parent_id', 'body',
         'edited_at', 'deleted_at', 'created_at', 'updated_at',
     ]))->toBeTrue();
 });

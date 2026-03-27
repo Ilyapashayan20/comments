@@ -5,9 +5,9 @@ namespace Relaticle\Comments\Concerns;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 
-trait IsCommenter
+trait CanComment
 {
-    public function getCommentName(): string
+    public function getCommentDisplayName(): string
     {
         if ($this instanceof HasName) {
             return $this->getFilamentName();

@@ -1,7 +1,7 @@
 <?php
 
 use Carbon\Carbon;
-use Relaticle\Comments\Comment;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -12,14 +12,14 @@ it('can be created with factory', function () {
     $comment = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($comment)->toBeInstanceOf(Comment::class);
     expect($comment->body)->toBeString();
     expect($comment->commentable_id)->toBe($post->id);
-    expect($comment->user_id)->toBe($user->id);
+    expect($comment->commenter_id)->toBe($user->id);
 });
 
 it('belongs to a commentable model via morphTo', function () {
@@ -29,27 +29,27 @@ it('belongs to a commentable model via morphTo', function () {
     $comment = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($comment->commentable)->toBeInstanceOf(Post::class);
     expect($comment->commentable->id)->toBe($post->id);
 });
 
-it('belongs to a user via morphTo', function () {
+it('belongs to a commenter via morphTo', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();
 
     $comment = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
-    expect($comment->user)->toBeInstanceOf(User::class);
-    expect($comment->user->id)->toBe($user->id);
+    expect($comment->commenter)->toBeInstanceOf(User::class);
+    expect($comment->commenter->id)->toBe($user->id);
 });
 
 it('supports threading with parent and replies', function () {
@@ -59,15 +59,15 @@ it('supports threading with parent and replies', function () {
     $parent = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     $reply = Comment::factory()->withParent($parent)->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($reply->parent->id)->toBe($parent->id);
@@ -82,15 +82,15 @@ it('identifies top-level vs reply comments', function () {
     $topLevel = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     $reply = Comment::factory()->withParent($topLevel)->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($topLevel->isTopLevel())->toBeTrue();
@@ -105,8 +105,8 @@ it('calculates depth correctly', function () {
     $attrs = [
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ];
 
     $level0 = Comment::factory()->create($attrs);
@@ -124,8 +124,8 @@ it('checks canReply based on max depth', function () {
     $attrs = [
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ];
 
     $level0 = Comment::factory()->create($attrs);
@@ -144,8 +144,8 @@ it('supports soft deletes', function () {
     $comment = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     $comment->delete();
@@ -162,8 +162,8 @@ it('tracks edited state', function () {
     $comment = Comment::factory()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($comment->isEdited())->toBeFalse();
@@ -171,8 +171,8 @@ it('tracks edited state', function () {
     $edited = Comment::factory()->edited()->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($edited->isEdited())->toBeTrue();
@@ -185,8 +185,8 @@ it('detects when it has replies', function () {
     $attrs = [
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ];
 
     $parent = Comment::factory()->create($attrs);

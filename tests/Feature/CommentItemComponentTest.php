@@ -1,8 +1,8 @@
 <?php
 
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Livewire\CommentItem;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -13,8 +13,8 @@ it('allows author to start and save edit on their comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Original body</p>',
     ]);
 
@@ -42,8 +42,8 @@ it('marks edited comment with edited indicator', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Original</p>',
     ]);
 
@@ -70,8 +70,8 @@ it('prevents non-author from editing a comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'body' => '<p>Author comment</p>',
     ]);
 
@@ -89,8 +89,8 @@ it('allows author to delete their own comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -108,8 +108,8 @@ it('preserves replies when parent comment is deleted', function () {
     $attrs = [
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ];
 
     $parent = Comment::factory()->create($attrs);
@@ -133,8 +133,8 @@ it('prevents non-author from deleting a comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
     ]);
 
     $this->actingAs($otherUser);
@@ -151,8 +151,8 @@ it('allows user to reply to a comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -169,7 +169,7 @@ it('allows user to reply to a comment', function () {
 
     expect($reply)->not->toBeNull();
     expect($reply->body)->toBe('<p>My reply</p>');
-    expect($reply->user_id)->toBe($user->id);
+    expect($reply->commenter_id)->toBe($user->id);
     expect($reply->commentable_id)->toBe($post->id);
 });
 
@@ -179,8 +179,8 @@ it('respects max depth for replies', function () {
     $attrs = [
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ];
 
     config(['comments.threading.max_depth' => 1]);
@@ -202,8 +202,8 @@ it('resets state when cancelling edit', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Some body</p>',
     ]);
 
@@ -224,8 +224,8 @@ it('resets state when cancelling reply', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -245,14 +245,14 @@ it('loads all replies within a thread eagerly', function () {
     $attrs = [
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ];
 
     $parent = Comment::factory()->create($attrs);
     Comment::factory()->count(3)->withParent($parent)->create($attrs);
 
-    $parentWithReplies = Comment::with('replies.user')->find($parent->id);
+    $parentWithReplies = Comment::with('replies.commenter')->find($parent->id);
 
     $this->actingAs($user);
 

@@ -1,8 +1,8 @@
 <?php
 
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\CommentAttachment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
+use Relaticle\Comments\Models\Attachment;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -13,12 +13,12 @@ it('creates a comment attachment with all metadata fields', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Test comment</p>',
     ]);
 
-    $attachment = CommentAttachment::create([
+    $attachment = Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => 'comments/attachments/1/photo.jpg',
         'original_name' => 'photo.jpg',
@@ -27,7 +27,7 @@ it('creates a comment attachment with all metadata fields', function () {
         'disk' => 'public',
     ]);
 
-    expect($attachment)->toBeInstanceOf(CommentAttachment::class)
+    expect($attachment)->toBeInstanceOf(Attachment::class)
         ->and($attachment->file_path)->toBe('comments/attachments/1/photo.jpg')
         ->and($attachment->original_name)->toBe('photo.jpg')
         ->and($attachment->mime_type)->toBe('image/jpeg')
@@ -42,12 +42,12 @@ it('belongs to a comment via comment() relationship', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Test</p>',
     ]);
 
-    $attachment = CommentAttachment::create([
+    $attachment = Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => 'comments/attachments/1/test.png',
         'original_name' => 'test.png',
@@ -67,12 +67,12 @@ it('has attachments() hasMany relationship on Comment', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Test</p>',
     ]);
 
-    CommentAttachment::create([
+    Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => 'comments/attachments/1/file1.png',
         'original_name' => 'file1.png',
@@ -81,7 +81,7 @@ it('has attachments() hasMany relationship on Comment', function () {
         'disk' => 'public',
     ]);
 
-    CommentAttachment::create([
+    Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => 'comments/attachments/1/file2.pdf',
         'original_name' => 'file2.pdf',
@@ -91,7 +91,7 @@ it('has attachments() hasMany relationship on Comment', function () {
     ]);
 
     expect($comment->attachments)->toHaveCount(2)
-        ->and($comment->attachments->first())->toBeInstanceOf(CommentAttachment::class);
+        ->and($comment->attachments->first())->toBeInstanceOf(Attachment::class);
 });
 
 it('cascade deletes attachments when comment is force deleted', function () {
@@ -101,12 +101,12 @@ it('cascade deletes attachments when comment is force deleted', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Test</p>',
     ]);
 
-    CommentAttachment::create([
+    Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => 'comments/attachments/1/photo.jpg',
         'original_name' => 'photo.jpg',
@@ -115,15 +115,15 @@ it('cascade deletes attachments when comment is force deleted', function () {
         'disk' => 'public',
     ]);
 
-    expect(CommentAttachment::where('comment_id', $comment->id)->count())->toBe(1);
+    expect(Attachment::where('comment_id', $comment->id)->count())->toBe(1);
 
     $comment->forceDelete();
 
-    expect(CommentAttachment::where('comment_id', $comment->id)->count())->toBe(0);
+    expect(Attachment::where('comment_id', $comment->id)->count())->toBe(0);
 });
 
 it('correctly identifies image and non-image mime types via isImage()', function (string $mimeType, bool $expected) {
-    $attachment = new CommentAttachment(['mime_type' => $mimeType]);
+    $attachment = new Attachment(['mime_type' => $mimeType]);
 
     expect($attachment->isImage())->toBe($expected);
 })->with([
@@ -142,12 +142,12 @@ it('formats bytes into human-readable size via formattedSize()', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Test</p>',
     ]);
 
-    $attachment = CommentAttachment::create([
+    $attachment = Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => 'comments/attachments/1/file.pdf',
         'original_name' => 'file.pdf',
@@ -160,15 +160,15 @@ it('formats bytes into human-readable size via formattedSize()', function () {
 });
 
 it('returns default attachment disk as public', function () {
-    expect(Config::getAttachmentDisk())->toBe('public');
+    expect(CommentsConfig::getAttachmentDisk())->toBe('public');
 });
 
 it('returns default attachment max size as 10240', function () {
-    expect(Config::getAttachmentMaxSize())->toBe(10240);
+    expect(CommentsConfig::getAttachmentMaxSize())->toBe(10240);
 });
 
 it('returns default allowed attachment types', function () {
-    $allowedTypes = Config::getAttachmentAllowedTypes();
+    $allowedTypes = CommentsConfig::getAttachmentAllowedTypes();
 
     expect($allowedTypes)->toBeArray()
         ->toContain('image/jpeg')
@@ -181,17 +181,17 @@ it('respects custom config overrides for attachment settings', function () {
     config(['comments.attachments.max_size' => 5120]);
     config(['comments.attachments.allowed_types' => ['image/png']]);
 
-    expect(Config::getAttachmentDisk())->toBe('s3')
-        ->and(Config::getAttachmentMaxSize())->toBe(5120)
-        ->and(Config::getAttachmentAllowedTypes())->toBe(['image/png']);
+    expect(CommentsConfig::getAttachmentDisk())->toBe('s3')
+        ->and(CommentsConfig::getAttachmentMaxSize())->toBe(5120)
+        ->and(CommentsConfig::getAttachmentAllowedTypes())->toBe(['image/png']);
 });
 
 it('reports attachments as enabled by default', function () {
-    expect(Config::areAttachmentsEnabled())->toBeTrue();
+    expect(CommentsConfig::areAttachmentsEnabled())->toBeTrue();
 });
 
 it('respects disabled attachments config', function () {
     config(['comments.attachments.enabled' => false]);
 
-    expect(Config::areAttachmentsEnabled())->toBeFalse();
+    expect(CommentsConfig::areAttachmentsEnabled())->toBeFalse();
 });

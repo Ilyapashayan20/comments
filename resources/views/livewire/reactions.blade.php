@@ -25,7 +25,7 @@
             {{-- Emoji picker dropdown --}}
             <div x-show="open" x-cloak @click.outside="open = false"
                 class="absolute bottom-full left-0 z-50 mb-1 flex gap-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-600 dark:bg-gray-800">
-                @foreach (\Relaticle\Comments\Config::getReactionEmojiSet() as $key => $emoji)
+                @foreach (\Relaticle\Comments\CommentsConfig::getReactionEmojiSet() as $key => $emoji)
                     <button wire:click="toggleReaction('{{ $key }}')" type="button"
                         class="rounded p-1 text-base hover:bg-gray-100 dark:hover:bg-gray-700"
                         title="{{ str_replace('_', ' ', $key) }}">

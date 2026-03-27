@@ -5,9 +5,9 @@ namespace Relaticle\Comments\Livewire;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Events\CommentReacted;
+use Relaticle\Comments\Models\Comment;
 
 class Reactions extends Component
 {
@@ -22,19 +22,19 @@ class Reactions extends Component
 
     public function toggleReaction(string $reaction): void
     {
-        $user = Config::resolveAuthenticatedUser();
+        $user = CommentsConfig::resolveAuthenticatedUser();
 
         if (! $user) {
             return;
         }
 
-        if (! in_array($reaction, Config::getAllowedReactions())) {
+        if (! in_array($reaction, CommentsConfig::getAllowedReactions())) {
             return;
         }
 
         $existing = $this->comment->reactions()
-            ->where('user_id', $user->getKey())
-            ->where('user_type', $user->getMorphClass())
+            ->where('commenter_id', $user->getKey())
+            ->where('commenter_type', $user->getMorphClass())
             ->where('reaction', $reaction)
             ->first();
 
@@ -44,8 +44,8 @@ class Reactions extends Component
             event(new CommentReacted($this->comment, $user, $reaction, 'removed'));
         } else {
             $this->comment->reactions()->create([
-                'user_id' => $user->getKey(),
-                'user_type' => $user->getMorphClass(),
+                'commenter_id' => $user->getKey(),
+                'commenter_type' => $user->getMorphClass(),
                 'reaction' => $reaction,
             ]);
 
@@ -66,13 +66,13 @@ class Reactions extends Component
     #[Computed]
     public function reactionSummary(): array
     {
-        $user = Config::resolveAuthenticatedUser();
+        $user = CommentsConfig::resolveAuthenticatedUser();
         $userId = $user?->getKey();
         $userType = $user?->getMorphClass();
 
-        $reactions = $this->comment->reactions()->with('user')->get();
+        $reactions = $this->comment->reactions()->with('commenter')->get();
 
-        $emojiSet = Config::getReactionEmojiSet();
+        $emojiSet = CommentsConfig::getReactionEmojiSet();
 
         return $reactions
             ->groupBy('reaction')
@@ -81,10 +81,10 @@ class Reactions extends Component
                     'reaction' => $key,
                     'emoji' => $emojiSet[$key] ?? $key,
                     'count' => $group->count(),
-                    'names' => $group->pluck('user.name')->filter()->take(3)->values()->all(),
+                    'names' => $group->pluck('commenter.name')->filter()->take(3)->values()->all(),
                     'total_reactors' => $group->count(),
                     'reacted_by_user' => $group->contains(
-                        fn ($r) => $r->user_id == $userId && $r->user_type === $userType
+                        fn ($r) => $r->commenter_id == $userId && $r->commenter_type === $userType
                     ),
                 ];
             })

@@ -48,13 +48,13 @@ abstract class TestCase extends Orchestra
             $table->timestamps();
         });
 
-        Schema::create(config('comments.tables.comments', 'comments'), function (Blueprint $table) {
+        Schema::create(config('comments.table_names.comments', 'comments'), function (Blueprint $table) {
             $table->id();
             $table->morphs('commentable');
-            $table->morphs('user');
+            $table->morphs('commenter');
             $table->foreignId('parent_id')
                 ->nullable()
-                ->constrained(config('comments.tables.comments', 'comments'))
+                ->constrained(config('comments.table_names.comments', 'comments'))
                 ->cascadeOnDelete();
             $table->text('body');
             $table->timestamp('edited_at')->nullable();
@@ -67,30 +67,30 @@ abstract class TestCase extends Orchestra
         Schema::create('comment_mentions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('comment_id')
-                ->constrained(config('comments.tables.comments', 'comments'))
+                ->constrained(config('comments.table_names.comments', 'comments'))
                 ->cascadeOnDelete();
-            $table->morphs('user');
+            $table->morphs('commenter');
             $table->timestamps();
 
-            $table->unique(['comment_id', 'user_id', 'user_type']);
+            $table->unique(['comment_id', 'commenter_id', 'commenter_type']);
         });
 
         Schema::create('comment_reactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('comment_id')
-                ->constrained(config('comments.tables.comments', 'comments'))
+                ->constrained(config('comments.table_names.comments', 'comments'))
                 ->cascadeOnDelete();
-            $table->morphs('user');
+            $table->morphs('commenter');
             $table->string('reaction');
             $table->timestamps();
 
-            $table->unique(['comment_id', 'user_id', 'user_type', 'reaction']);
+            $table->unique(['comment_id', 'commenter_id', 'commenter_type', 'reaction']);
         });
 
         Schema::create('comment_attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('comment_id')
-                ->constrained(config('comments.tables.comments', 'comments'))
+                ->constrained(config('comments.table_names.comments', 'comments'))
                 ->cascadeOnDelete();
             $table->string('file_path');
             $table->string('original_name');
@@ -112,10 +112,10 @@ abstract class TestCase extends Orchestra
         Schema::create('comment_subscriptions', function (Blueprint $table) {
             $table->id();
             $table->morphs('commentable');
-            $table->morphs('user');
+            $table->morphs('commenter');
             $table->timestamp('created_at')->nullable();
 
-            $table->unique(['commentable_type', 'commentable_id', 'user_type', 'user_id'], 'comment_subscriptions_unique');
+            $table->unique(['commentable_type', 'commentable_id', 'commenter_type', 'commenter_id'], 'comment_subscriptions_unique');
         });
     }
 

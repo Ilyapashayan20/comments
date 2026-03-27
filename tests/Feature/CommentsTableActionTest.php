@@ -1,7 +1,7 @@
 <?php
 
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Filament\Actions\CommentsTableAction;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -30,8 +30,8 @@ it('shows badge with comment count for the record', function () {
     Comment::factory()->count(5)->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $action = CommentsTableAction::make('comments');

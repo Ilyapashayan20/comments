@@ -1,31 +1,32 @@
 <?php
 
-namespace Relaticle\Comments;
+namespace Relaticle\Comments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Relaticle\Comments\CommentsConfig;
 
-class CommentReaction extends Model
+class Reaction extends Model
 {
     protected $fillable = [
         'comment_id',
-        'user_id',
-        'user_type',
+        'commenter_id',
+        'commenter_type',
         'reaction',
     ];
 
     public function getTable(): string
     {
-        return 'comment_reactions';
+        return CommentsConfig::getTableName('reactions');
     }
 
     public function comment(): BelongsTo
     {
-        return $this->belongsTo(Config::getCommentModel());
+        return $this->belongsTo(CommentsConfig::getCommentModel());
     }
 
-    public function user(): MorphTo
+    public function commenter(): MorphTo
     {
         return $this->morphTo();
     }

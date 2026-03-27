@@ -42,20 +42,20 @@ class CommentsServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         Relation::morphMap([
-            'comment' => Config::getCommentModel(),
+            'comment' => CommentsConfig::getCommentModel(),
         ]);
 
         $this->app->bind(
             MentionResolver::class,
-            fn () => new (Config::getMentionResolver())
+            fn () => new (CommentsConfig::getMentionResolver())
         );
     }
 
     public function packageBooted(): void
     {
         Gate::policy(
-            Config::getCommentModel(),
-            Config::getPolicyClass(),
+            CommentsConfig::getCommentModel(),
+            CommentsConfig::getPolicyClass(),
         );
 
         Event::listen(CommentCreated::class, SendCommentRepliedNotification::class);

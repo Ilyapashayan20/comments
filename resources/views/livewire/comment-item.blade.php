@@ -3,11 +3,11 @@
     <div class="shrink-0">
         @if ($comment->trashed())
             <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-        @elseif ($comment->user?->getCommentAvatarUrl())
-            <img src="{{ $comment->user->getCommentAvatarUrl() }}" alt="{{ $comment->user->getCommentName() }}" class="h-8 w-8 rounded-full object-cover">
+        @elseif ($comment->commenter?->getCommentAvatarUrl())
+            <img src="{{ $comment->commenter->getCommentAvatarUrl() }}" alt="{{ $comment->commenter->getCommentDisplayName() }}" class="h-8 w-8 rounded-full object-cover">
         @else
             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700 dark:bg-primary-800 dark:text-primary-300">
-                {{ str($comment->user?->getCommentName() ?? '?')->substr(0, 1)->upper() }}
+                {{ str($comment->commenter?->getCommentDisplayName() ?? '?')->substr(0, 1)->upper() }}
             </div>
         @endif
     </div>
@@ -20,7 +20,7 @@
             {{-- Header: name + timestamp --}}
             <div class="flex items-center gap-2">
                 <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {{ $comment->user?->getCommentName() ?? 'Unknown' }}
+                    {{ $comment->commenter?->getCommentDisplayName() ?? 'Unknown' }}
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400" title="{{ $comment->created_at->format('M j, Y g:i A') }}">
                     {{ $comment->created_at->diffForHumans() }}
@@ -200,14 +200,14 @@
                     <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                 @enderror
 
-                @if (\Relaticle\Comments\Config::areAttachmentsEnabled())
+                @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
                     <div class="mt-2">
                         <label class="flex cursor-pointer items-center gap-2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
                             </svg>
                             Attach files
-                            <input type="file" wire:model="replyAttachments" multiple class="hidden" accept="{{ implode(',', \Relaticle\Comments\Config::getAttachmentAllowedTypes()) }}" />
+                            <input type="file" wire:model="replyAttachments" multiple class="hidden" accept="{{ implode(',', \Relaticle\Comments\CommentsConfig::getAttachmentAllowedTypes()) }}" />
                         </label>
                     </div>
 

@@ -1,9 +1,9 @@
 <?php
 
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Livewire\CommentItem;
 use Relaticle\Comments\Livewire\Comments;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -92,8 +92,8 @@ it('stores mentions when editing comment with @mention', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Original comment</p>',
     ]);
 

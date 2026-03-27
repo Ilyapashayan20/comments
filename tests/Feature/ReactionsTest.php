@@ -2,11 +2,11 @@
 
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\CommentReaction;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Events\CommentReacted;
 use Relaticle\Comments\Livewire\Reactions;
+use Relaticle\Comments\Models\Comment;
+use Relaticle\Comments\Models\Reaction;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -17,8 +17,8 @@ it('adds a reaction when user clicks an emoji', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -26,10 +26,10 @@ it('adds a reaction when user clicks an emoji', function () {
     Livewire::test(Reactions::class, ['comment' => $comment])
         ->call('toggleReaction', 'thumbs_up');
 
-    expect(CommentReaction::where([
+    expect(Reaction::where([
         'comment_id' => $comment->id,
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'reaction' => 'thumbs_up',
     ])->exists())->toBeTrue();
 });
@@ -41,14 +41,14 @@ it('removes a reaction when toggling same emoji', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'reaction' => 'thumbs_up',
     ]);
 
@@ -57,10 +57,10 @@ it('removes a reaction when toggling same emoji', function () {
     Livewire::test(Reactions::class, ['comment' => $comment])
         ->call('toggleReaction', 'thumbs_up');
 
-    expect(CommentReaction::where([
+    expect(Reaction::where([
         'comment_id' => $comment->id,
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'reaction' => 'thumbs_up',
     ])->exists())->toBeFalse();
 });
@@ -74,8 +74,8 @@ it('fires CommentReacted event with added action', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -98,14 +98,14 @@ it('fires CommentReacted event with removed action', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'reaction' => 'heart',
     ]);
 
@@ -133,35 +133,35 @@ it('returns correct reaction summary with counts', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user1->getKey(),
-        'user_type' => $user1->getMorphClass(),
+        'commenter_id' => $user1->getKey(),
+        'commenter_type' => $user1->getMorphClass(),
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $user1->getKey(),
-        'user_type' => $user1->getMorphClass(),
+        'commenter_id' => $user1->getKey(),
+        'commenter_type' => $user1->getMorphClass(),
         'reaction' => 'thumbs_up',
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $user2->getKey(),
-        'user_type' => $user2->getMorphClass(),
+        'commenter_id' => $user2->getKey(),
+        'commenter_type' => $user2->getMorphClass(),
         'reaction' => 'thumbs_up',
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $user3->getKey(),
-        'user_type' => $user3->getMorphClass(),
+        'commenter_id' => $user3->getKey(),
+        'commenter_type' => $user3->getMorphClass(),
         'reaction' => 'thumbs_up',
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $user1->getKey(),
-        'user_type' => $user1->getMorphClass(),
+        'commenter_id' => $user1->getKey(),
+        'commenter_type' => $user1->getMorphClass(),
         'reaction' => 'heart',
     ]);
 
@@ -187,14 +187,14 @@ it('requires authentication to react', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     Livewire::test(Reactions::class, ['comment' => $comment])
         ->call('toggleReaction', 'thumbs_up');
 
-    expect(CommentReaction::count())->toBe(0);
+    expect(Reaction::count())->toBe(0);
 });
 
 it('allows multiple reaction types from same user', function () {
@@ -204,8 +204,8 @@ it('allows multiple reaction types from same user', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -215,17 +215,17 @@ it('allows multiple reaction types from same user', function () {
     $component->call('toggleReaction', 'thumbs_up');
     $component->call('toggleReaction', 'heart');
 
-    expect(CommentReaction::where([
+    expect(Reaction::where([
         'comment_id' => $comment->id,
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'reaction' => 'thumbs_up',
     ])->exists())->toBeTrue();
 
-    expect(CommentReaction::where([
+    expect(Reaction::where([
         'comment_id' => $comment->id,
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'reaction' => 'heart',
     ])->exists())->toBeTrue();
 });
@@ -238,8 +238,8 @@ it('allows same reaction from multiple users', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user1->getKey(),
-        'user_type' => $user1->getMorphClass(),
+        'commenter_id' => $user1->getKey(),
+        'commenter_type' => $user1->getMorphClass(),
     ]);
 
     $this->actingAs($user1);
@@ -250,7 +250,7 @@ it('allows same reaction from multiple users', function () {
     Livewire::test(Reactions::class, ['comment' => $comment])
         ->call('toggleReaction', 'thumbs_up');
 
-    expect(CommentReaction::where([
+    expect(Reaction::where([
         'comment_id' => $comment->id,
         'reaction' => 'thumbs_up',
     ])->count())->toBe(2);
@@ -263,8 +263,8 @@ it('rejects invalid reaction keys', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -272,7 +272,7 @@ it('rejects invalid reaction keys', function () {
     Livewire::test(Reactions::class, ['comment' => $comment])
         ->call('toggleReaction', 'invalid_emoji');
 
-    expect(CommentReaction::count())->toBe(0);
+    expect(Reaction::count())->toBe(0);
 });
 
 it('marks reacted_by_user correctly in summary', function () {
@@ -283,14 +283,14 @@ it('marks reacted_by_user correctly in summary', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $userA->getKey(),
-        'user_type' => $userA->getMorphClass(),
+        'commenter_id' => $userA->getKey(),
+        'commenter_type' => $userA->getMorphClass(),
     ]);
 
-    CommentReaction::create([
+    Reaction::create([
         'comment_id' => $comment->id,
-        'user_id' => $userA->getKey(),
-        'user_type' => $userA->getMorphClass(),
+        'commenter_id' => $userA->getKey(),
+        'commenter_type' => $userA->getMorphClass(),
         'reaction' => 'thumbs_up',
     ]);
 
@@ -310,7 +310,7 @@ it('marks reacted_by_user correctly in summary', function () {
 });
 
 it('returns configured emoji set from config', function () {
-    $emojiSet = Config::getReactionEmojiSet();
+    $emojiSet = CommentsConfig::getReactionEmojiSet();
 
     expect($emojiSet)->toBeArray();
     expect($emojiSet)->toHaveKey('thumbs_up');
@@ -322,7 +322,7 @@ it('returns configured emoji set from config', function () {
 });
 
 it('returns allowed reaction keys from config', function () {
-    $allowed = Config::getAllowedReactions();
+    $allowed = CommentsConfig::getAllowedReactions();
 
     expect($allowed)->toBeArray();
     expect($allowed)->toContain('thumbs_up');

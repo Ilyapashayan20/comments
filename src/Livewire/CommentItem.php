@@ -6,13 +6,13 @@ use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Contracts\MentionResolver;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Events\CommentDeleted;
 use Relaticle\Comments\Events\CommentUpdated;
 use Relaticle\Comments\Mentions\MentionParser;
+use Relaticle\Comments\Models\Comment;
 
 class CommentItem extends Component
 {
@@ -106,25 +106,25 @@ class CommentItem extends Component
 
         $rules = ['replyBody' => ['required', 'string', 'min:1']];
 
-        if (Config::areAttachmentsEnabled()) {
-            $maxSize = Config::getAttachmentMaxSize();
-            $allowedTypes = implode(',', Config::getAttachmentAllowedTypes());
+        if (CommentsConfig::areAttachmentsEnabled()) {
+            $maxSize = CommentsConfig::getAttachmentMaxSize();
+            $allowedTypes = implode(',', CommentsConfig::getAttachmentAllowedTypes());
             $rules['replyAttachments.*'] = ['nullable', 'file', "max:{$maxSize}", "mimetypes:{$allowedTypes}"];
         }
 
         $this->validate($rules);
 
-        $user = Config::resolveAuthenticatedUser();
+        $user = CommentsConfig::resolveAuthenticatedUser();
 
         $reply = $this->comment->commentable->comments()->create([
             'body' => $this->replyBody,
             'parent_id' => $this->comment->id,
-            'user_id' => $user->getKey(),
-            'user_type' => $user->getMorphClass(),
+            'commenter_id' => $user->getKey(),
+            'commenter_type' => $user->getMorphClass(),
         ]);
 
-        if (Config::areAttachmentsEnabled() && ! empty($this->replyAttachments)) {
-            $disk = Config::getAttachmentDisk();
+        if (CommentsConfig::areAttachmentsEnabled() && ! empty($this->replyAttachments)) {
+            $disk = CommentsConfig::getAttachmentDisk();
 
             foreach ($this->replyAttachments as $file) {
                 $path = $file->store("comments/attachments/{$reply->id}", $disk);
@@ -169,7 +169,7 @@ class CommentItem extends Component
         return $resolver->search($query)
             ->map(fn ($user) => [
                 'id' => $user->getKey(),
-                'name' => $user->getCommentName(),
+                'name' => $user->getCommentDisplayName(),
                 'avatar_url' => $user->getCommentAvatarUrl(),
             ])
             ->values()

@@ -1,6 +1,6 @@
 <?php
 
-use Relaticle\Comments\Comment;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -11,8 +11,8 @@ it('provides comments relationship on commentable model', function () {
     Comment::factory()->count(3)->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($post->comments)->toHaveCount(3);
@@ -25,8 +25,8 @@ it('provides topLevelComments excluding replies', function () {
     $attrs = [
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ];
 
     $topLevel = Comment::factory()->create($attrs);
@@ -46,8 +46,8 @@ it('provides comment count', function () {
     Comment::factory()->count(5)->create([
         'commentable_type' => $post->getMorphClass(),
         'commentable_id' => $post->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($post->commentCount())->toBe(5);
@@ -61,15 +61,15 @@ it('scopes comments to the specific commentable', function () {
     Comment::factory()->count(3)->create([
         'commentable_type' => $post1->getMorphClass(),
         'commentable_id' => $post1->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     Comment::factory()->count(2)->create([
         'commentable_type' => $post2->getMorphClass(),
         'commentable_id' => $post2->id,
-        'user_type' => $user->getMorphClass(),
-        'user_id' => $user->id,
+        'commenter_type' => $user->getMorphClass(),
+        'commenter_id' => $user->id,
     ]);
 
     expect($post1->commentCount())->toBe(3);

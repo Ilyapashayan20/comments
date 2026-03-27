@@ -1,13 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Notification;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\CommentSubscription;
-use Relaticle\Comments\Config;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Events\UserMentioned;
 use Relaticle\Comments\Listeners\SendCommentRepliedNotification;
 use Relaticle\Comments\Listeners\SendUserMentionedNotification;
+use Relaticle\Comments\Models\Comment;
+use Relaticle\Comments\Models\Subscription;
 use Relaticle\Comments\Notifications\CommentRepliedNotification;
 use Relaticle\Comments\Notifications\UserMentionedNotification;
 use Relaticle\Comments\Tests\Models\Post;
@@ -22,8 +21,8 @@ it('returns correct via channels from config for CommentRepliedNotification', fu
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Hello</p>',
     ]);
 
@@ -39,8 +38,8 @@ it('returns toDatabase array with comment data for CommentRepliedNotification', 
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>This is a reply body</p>',
     ]);
 
@@ -51,7 +50,7 @@ it('returns toDatabase array with comment data for CommentRepliedNotification', 
         ->and($data['comment_id'])->toBe($comment->id)
         ->and($data['commentable_type'])->toBe($post->getMorphClass())
         ->and($data['commentable_id'])->toBe($post->id)
-        ->and($data['commenter_name'])->toBe($user->getCommentName());
+        ->and($data['commenter_name'])->toBe($user->getCommentDisplayName());
 });
 
 it('returns correct via channels from config for UserMentionedNotification', function () {
@@ -64,8 +63,8 @@ it('returns correct via channels from config for UserMentionedNotification', fun
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $mentionedBy->getKey(),
-        'user_type' => $mentionedBy->getMorphClass(),
+        'commenter_id' => $mentionedBy->getKey(),
+        'commenter_type' => $mentionedBy->getMorphClass(),
         'body' => '<p>Hey @someone</p>',
     ]);
 
@@ -82,8 +81,8 @@ it('returns toDatabase array with mention data for UserMentionedNotification', f
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $mentioner->getKey(),
-        'user_type' => $mentioner->getMorphClass(),
+        'commenter_id' => $mentioner->getKey(),
+        'commenter_type' => $mentioner->getMorphClass(),
         'body' => '<p>Hey @mentioned</p>',
     ]);
 
@@ -92,7 +91,7 @@ it('returns toDatabase array with mention data for UserMentionedNotification', f
 
     expect($data)->toHaveKeys(['comment_id', 'commentable_type', 'commentable_id', 'mentioner_name', 'body'])
         ->and($data['comment_id'])->toBe($comment->id)
-        ->and($data['mentioner_name'])->toBe($mentioner->getCommentName());
+        ->and($data['mentioner_name'])->toBe($mentioner->getCommentDisplayName());
 });
 
 it('sends notification to subscribers when reply comment is created', function () {
@@ -102,21 +101,21 @@ it('sends notification to subscribers when reply comment is created', function (
     $subscriber = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $subscriber);
+    Subscription::subscribe($post, $subscriber);
 
     $parentComment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $subscriber->getKey(),
-        'user_type' => $subscriber->getMorphClass(),
+        'commenter_id' => $subscriber->getKey(),
+        'commenter_type' => $subscriber->getMorphClass(),
         'body' => '<p>Original comment</p>',
     ]);
 
     $reply = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'parent_id' => $parentComment->id,
         'body' => '<p>Reply to original</p>',
     ]);
@@ -134,13 +133,13 @@ it('does NOT send notification for top-level comments', function () {
     $subscriber = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $subscriber);
+    Subscription::subscribe($post, $subscriber);
 
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'body' => '<p>Top-level comment</p>',
     ]);
 
@@ -156,21 +155,21 @@ it('does NOT notify the reply author themselves', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $user);
+    Subscription::subscribe($post, $user);
 
     $parentComment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>My comment</p>',
     ]);
 
     $reply = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'parent_id' => $parentComment->id,
         'body' => '<p>My own reply</p>',
     ]);
@@ -187,20 +186,20 @@ it('auto-subscribes comment author to the thread', function () {
     $author = User::factory()->create();
     $post = Post::factory()->create();
 
-    expect(CommentSubscription::isSubscribed($post, $author))->toBeFalse();
+    expect(Subscription::isSubscribed($post, $author))->toBeFalse();
 
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'body' => '<p>Comment</p>',
     ]);
 
     $listener = new SendCommentRepliedNotification;
     $listener->handle(new CommentCreated($comment));
 
-    expect(CommentSubscription::isSubscribed($post, $author))->toBeTrue();
+    expect(Subscription::isSubscribed($post, $author))->toBeTrue();
 });
 
 it('only notifies subscribed users for reply notifications', function () {
@@ -211,21 +210,21 @@ it('only notifies subscribed users for reply notifications', function () {
     $nonSubscriber = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $subscriber);
+    Subscription::subscribe($post, $subscriber);
 
     $parentComment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $subscriber->getKey(),
-        'user_type' => $subscriber->getMorphClass(),
+        'commenter_id' => $subscriber->getKey(),
+        'commenter_type' => $subscriber->getMorphClass(),
         'body' => '<p>Original</p>',
     ]);
 
     $reply = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'parent_id' => $parentComment->id,
         'body' => '<p>Reply</p>',
     ]);
@@ -247,8 +246,8 @@ it('sends mention notification to mentioned user', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'body' => '<p>Hey @mentioned</p>',
     ]);
 
@@ -268,8 +267,8 @@ it('does NOT send mention notification to the comment author', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'body' => '<p>Hey @myself</p>',
     ]);
 
@@ -287,13 +286,13 @@ it('auto-subscribes mentioned user to the thread', function () {
     $mentioned = User::factory()->create();
     $post = Post::factory()->create();
 
-    expect(CommentSubscription::isSubscribed($post, $mentioned))->toBeFalse();
+    expect(Subscription::isSubscribed($post, $mentioned))->toBeFalse();
 
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'body' => '<p>Hey @mentioned</p>',
     ]);
 
@@ -301,7 +300,7 @@ it('auto-subscribes mentioned user to the thread', function () {
     $listener = new SendUserMentionedNotification;
     $listener->handle($event);
 
-    expect(CommentSubscription::isSubscribed($post, $mentioned))->toBeTrue();
+    expect(Subscription::isSubscribed($post, $mentioned))->toBeTrue();
 });
 
 it('does not send notifications when notifications are disabled', function () {
@@ -313,21 +312,21 @@ it('does not send notifications when notifications are disabled', function () {
     $mentioned = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $subscriber);
+    Subscription::subscribe($post, $subscriber);
 
     $parentComment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $subscriber->getKey(),
-        'user_type' => $subscriber->getMorphClass(),
+        'commenter_id' => $subscriber->getKey(),
+        'commenter_type' => $subscriber->getMorphClass(),
         'body' => '<p>Original</p>',
     ]);
 
     $reply = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $author->getKey(),
-        'user_type' => $author->getMorphClass(),
+        'commenter_id' => $author->getKey(),
+        'commenter_type' => $author->getMorphClass(),
         'parent_id' => $parentComment->id,
         'body' => '<p>Reply</p>',
     ]);

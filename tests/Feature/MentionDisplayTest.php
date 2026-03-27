@@ -1,8 +1,8 @@
 <?php
 
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Livewire\CommentItem;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -14,12 +14,12 @@ it('renders mention with styled span', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>@Alice said hi</p>',
     ]);
 
-    $comment->mentions()->attach($alice->id, ['user_type' => $alice->getMorphClass()]);
+    $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);
 
     $rendered = $comment->renderBodyWithMentions();
 
@@ -36,13 +36,13 @@ it('renders multiple mentions with styled spans', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>@Alice and @Bob</p>',
     ]);
 
-    $comment->mentions()->attach($alice->id, ['user_type' => $alice->getMorphClass()]);
-    $comment->mentions()->attach($bob->id, ['user_type' => $bob->getMorphClass()]);
+    $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);
+    $comment->mentions()->attach($bob->id, ['commenter_type' => $bob->getMorphClass()]);
 
     $rendered = $comment->renderBodyWithMentions();
 
@@ -58,8 +58,8 @@ it('does not style non-mentioned @text', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>@ghost is not here</p>',
     ]);
 
@@ -76,12 +76,12 @@ it('renders comment-mention class in Livewire component', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Hello @Alice</p>',
     ]);
 
-    $comment->mentions()->attach($alice->id, ['user_type' => $alice->getMorphClass()]);
+    $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);
 
     $this->actingAs($user);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Relaticle\Comments;
+namespace Relaticle\Comments\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Database\Factories\CommentFactory;
 
 class Comment extends Model
@@ -35,14 +36,14 @@ class Comment extends Model
     protected $fillable = [
         'body',
         'parent_id',
-        'user_id',
-        'user_type',
+        'commenter_id',
+        'commenter_type',
         'edited_at',
     ];
 
     public function getTable(): string
     {
-        return Config::getCommentTable();
+        return CommentsConfig::getCommentTable();
     }
 
     /** @return array<string, string> */
@@ -63,39 +64,39 @@ class Comment extends Model
         return $this->morphTo();
     }
 
-    public function user(): MorphTo
+    public function commenter(): MorphTo
     {
         return $this->morphTo();
     }
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Config::getCommentModel(), 'parent_id');
+        return $this->belongsTo(CommentsConfig::getCommentModel(), 'parent_id');
     }
 
     public function replies(): HasMany
     {
-        return $this->hasMany(Config::getCommentModel(), 'parent_id');
+        return $this->hasMany(CommentsConfig::getCommentModel(), 'parent_id');
     }
 
     public function reactions(): HasMany
     {
-        return $this->hasMany(CommentReaction::class);
+        return $this->hasMany(Reaction::class);
     }
 
     public function attachments(): HasMany
     {
-        return $this->hasMany(CommentAttachment::class);
+        return $this->hasMany(Attachment::class);
     }
 
     public function mentions(): MorphToMany
     {
         return $this->morphedByMany(
-            Config::getCommenterModel(),
-            'user',
-            'comment_mentions',
+            CommentsConfig::getCommenterModel(),
+            'commenter',
+            CommentsConfig::getTableName('mentions'),
             'comment_id',
-            'user_id',
+            'commenter_id',
         );
     }
 
@@ -121,7 +122,7 @@ class Comment extends Model
 
     public function canReply(): bool
     {
-        return $this->depth() < Config::getMaxDepth();
+        return $this->depth() < CommentsConfig::getMaxDepth();
     }
 
     public function depth(): int
@@ -133,8 +134,8 @@ class Comment extends Model
             $comment = $comment->parent;
             $depth++;
 
-            if ($depth >= Config::getMaxDepth()) {
-                return Config::getMaxDepth();
+            if ($depth >= CommentsConfig::getMaxDepth()) {
+                return CommentsConfig::getMaxDepth();
             }
         }
 

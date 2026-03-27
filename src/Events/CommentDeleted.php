@@ -8,8 +8,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
+use Relaticle\Comments\Models\Comment;
 
 class CommentDeleted implements ShouldBroadcast
 {
@@ -27,7 +27,7 @@ class CommentDeleted implements ShouldBroadcast
     /** @return array<int, PrivateChannel> */
     public function broadcastOn(): array
     {
-        $prefix = Config::getBroadcastChannelPrefix();
+        $prefix = CommentsConfig::getBroadcastChannelPrefix();
 
         return [
             new PrivateChannel("{$prefix}.{$this->comment->commentable_type}.{$this->comment->commentable_id}"),
@@ -36,7 +36,7 @@ class CommentDeleted implements ShouldBroadcast
 
     public function broadcastWhen(): bool
     {
-        return Config::isBroadcastingEnabled();
+        return CommentsConfig::isBroadcastingEnabled();
     }
 
     /** @return array{comment_id: int|string, commentable_type: string, commentable_id: int|string} */

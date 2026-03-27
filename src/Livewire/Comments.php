@@ -9,12 +9,12 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\CommentSubscription;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Contracts\MentionResolver;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Mentions\MentionParser;
+use Relaticle\Comments\Models\Comment;
+use Relaticle\Comments\Models\Subscription;
 
 class Comments extends Component
 {
@@ -36,7 +36,7 @@ class Comments extends Component
     public function mount(Model $model): void
     {
         $this->model = $model;
-        $this->perPage = Config::getPerPage();
+        $this->perPage = CommentsConfig::getPerPage();
         $this->loadedCount = $this->perPage;
     }
 
@@ -46,7 +46,7 @@ class Comments extends Component
     {
         return $this->model
             ->topLevelComments()
-            ->with(['user', 'mentions', 'attachments', 'reactions.user', 'replies.user', 'replies.mentions', 'replies.attachments', 'replies.reactions.user'])
+            ->with(['commenter', 'mentions', 'attachments', 'reactions.commenter', 'replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter'])
             ->orderBy('created_at', $this->sortDirection)
             ->take($this->loadedCount)
             ->get();
@@ -67,27 +67,27 @@ class Comments extends Component
     #[Computed]
     public function isSubscribed(): bool
     {
-        $user = Config::resolveAuthenticatedUser();
+        $user = CommentsConfig::resolveAuthenticatedUser();
 
         if (! $user) {
             return false;
         }
 
-        return CommentSubscription::isSubscribed($this->model, $user);
+        return Subscription::isSubscribed($this->model, $user);
     }
 
     public function toggleSubscription(): void
     {
-        $user = Config::resolveAuthenticatedUser();
+        $user = CommentsConfig::resolveAuthenticatedUser();
 
         if (! $user) {
             return;
         }
 
         if ($this->isSubscribed) {
-            CommentSubscription::unsubscribe($this->model, $user);
+            Subscription::unsubscribe($this->model, $user);
         } else {
-            CommentSubscription::subscribe($this->model, $user);
+            Subscription::subscribe($this->model, $user);
         }
 
         unset($this->isSubscribed);
@@ -97,26 +97,26 @@ class Comments extends Component
     {
         $rules = ['newComment' => ['required', 'string', 'min:1']];
 
-        if (Config::areAttachmentsEnabled()) {
-            $maxSize = Config::getAttachmentMaxSize();
-            $allowedTypes = implode(',', Config::getAttachmentAllowedTypes());
+        if (CommentsConfig::areAttachmentsEnabled()) {
+            $maxSize = CommentsConfig::getAttachmentMaxSize();
+            $allowedTypes = implode(',', CommentsConfig::getAttachmentAllowedTypes());
             $rules['attachments.*'] = ['nullable', 'file', "max:{$maxSize}", "mimetypes:{$allowedTypes}"];
         }
 
         $this->validate($rules);
 
-        $this->authorize('create', Config::getCommentModel());
+        $this->authorize('create', CommentsConfig::getCommentModel());
 
-        $user = Config::resolveAuthenticatedUser();
+        $user = CommentsConfig::resolveAuthenticatedUser();
 
         $comment = $this->model->comments()->create([
             'body' => $this->newComment,
-            'user_id' => $user->getKey(),
-            'user_type' => $user->getMorphClass(),
+            'commenter_id' => $user->getKey(),
+            'commenter_type' => $user->getMorphClass(),
         ]);
 
-        if (Config::areAttachmentsEnabled() && ! empty($this->attachments)) {
-            $disk = Config::getAttachmentDisk();
+        if (CommentsConfig::areAttachmentsEnabled() && ! empty($this->attachments)) {
+            $disk = CommentsConfig::getAttachmentDisk();
 
             foreach ($this->attachments as $file) {
                 $path = $file->store("comments/attachments/{$comment->id}", $disk);
@@ -163,8 +163,8 @@ class Comments extends Component
             'commentUpdated' => 'refreshComments',
         ];
 
-        if (Config::isBroadcastingEnabled()) {
-            $prefix = Config::getBroadcastChannelPrefix();
+        if (CommentsConfig::isBroadcastingEnabled()) {
+            $prefix = CommentsConfig::getBroadcastChannelPrefix();
             $type = $this->model->getMorphClass();
             $id = $this->model->getKey();
             $channel = "echo-private:{$prefix}.{$type}.{$id}";
@@ -195,7 +195,7 @@ class Comments extends Component
         return $resolver->search($query)
             ->map(fn ($user) => [
                 'id' => $user->getKey(),
-                'name' => $user->getCommentName(),
+                'name' => $user->getCommentDisplayName(),
                 'avatar_url' => $user->getCommentAvatarUrl(),
             ])
             ->values()

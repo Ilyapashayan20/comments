@@ -1,17 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Mentions\DefaultMentionResolver;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Policies\CommentPolicy;
 
 return [
-    'tables' => [
-        'comments' => 'comments',
-    ],
-
     'models' => [
         'comment' => Comment::class,
+    ],
+
+    'table_names' => [
+        'comments' => 'comments',
+        'reactions' => 'comment_reactions',
+        'mentions' => 'comment_mentions',
+        'subscriptions' => 'comment_subscriptions',
+        'attachments' => 'comment_attachments',
+    ],
+
+    'column_names' => [
+        'commenter_morph' => 'commenter',
     ],
 
     'commenter' => [

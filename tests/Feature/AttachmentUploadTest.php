@@ -3,11 +3,11 @@
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\CommentAttachment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Livewire\CommentItem;
 use Relaticle\Comments\Livewire\Comments;
+use Relaticle\Comments\Models\Attachment;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -29,7 +29,7 @@ it('creates comment with file attachment via Livewire component', function () {
         ->assertSet('attachments', []);
 
     expect(Comment::count())->toBe(1);
-    expect(CommentAttachment::count())->toBe(1);
+    expect(Attachment::count())->toBe(1);
 });
 
 it('stores attachment with correct metadata', function () {
@@ -47,7 +47,7 @@ it('stores attachment with correct metadata', function () {
         ->set('attachments', [$file])
         ->call('addComment');
 
-    $attachment = CommentAttachment::first();
+    $attachment = Attachment::first();
     $comment = Comment::first();
 
     expect($attachment->original_name)->toBe('vacation.jpg')
@@ -73,7 +73,7 @@ it('stores file on configured disk at comments/attachments/{comment_id}/ path', 
         ->set('attachments', [$file])
         ->call('addComment');
 
-    $attachment = CommentAttachment::first();
+    $attachment = Attachment::first();
 
     Storage::disk('public')->assertExists($attachment->file_path);
     expect($attachment->file_path)->toContain("comments/attachments/{$attachment->comment_id}/");
@@ -88,15 +88,15 @@ it('displays image attachment thumbnail in comment item view', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Image comment</p>',
     ]);
 
     $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
     $path = $file->store("comments/attachments/{$comment->id}", 'public');
 
-    CommentAttachment::create([
+    Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => $path,
         'original_name' => 'photo.jpg',
@@ -123,15 +123,15 @@ it('displays non-image attachment as download link', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>PDF comment</p>',
     ]);
 
     $file = UploadedFile::fake()->create('document.pdf', 2048, 'application/pdf');
     $path = $file->store("comments/attachments/{$comment->id}", 'public');
 
-    CommentAttachment::create([
+    Attachment::create([
         'comment_id' => $comment->id,
         'file_path' => $path,
         'original_name' => 'document.pdf',
@@ -157,7 +157,7 @@ it('rejects file exceeding max size', function () {
 
     $this->actingAs($user);
 
-    $oversizedFile = UploadedFile::fake()->create('big.pdf', Config::getAttachmentMaxSize() + 1, 'application/pdf');
+    $oversizedFile = UploadedFile::fake()->create('big.pdf', CommentsConfig::getAttachmentMaxSize() + 1, 'application/pdf');
 
     Livewire::test(Comments::class, ['model' => $post])
         ->set('newComment', '<p>Oversized file</p>')
@@ -166,7 +166,7 @@ it('rejects file exceeding max size', function () {
         ->assertHasErrors('attachments.0');
 
     expect(Comment::count())->toBe(0);
-    expect(CommentAttachment::count())->toBe(0);
+    expect(Attachment::count())->toBe(0);
 });
 
 it('rejects disallowed file type', function () {
@@ -186,7 +186,7 @@ it('rejects disallowed file type', function () {
         ->assertHasErrors('attachments.0');
 
     expect(Comment::count())->toBe(0);
-    expect(CommentAttachment::count())->toBe(0);
+    expect(Attachment::count())->toBe(0);
 });
 
 it('accepts allowed file types', function () {
@@ -206,7 +206,7 @@ it('accepts allowed file types', function () {
         ->assertHasNoErrors('attachments.0');
 
     expect(Comment::count())->toBe(1);
-    expect(CommentAttachment::count())->toBe(1);
+    expect(Attachment::count())->toBe(1);
 });
 
 it('hides upload UI when attachments disabled', function () {
@@ -248,9 +248,9 @@ it('creates comment with multiple file attachments', function () {
         ->call('addComment');
 
     expect(Comment::count())->toBe(1);
-    expect(CommentAttachment::count())->toBe(2);
+    expect(Attachment::count())->toBe(2);
 
-    $attachments = CommentAttachment::all();
+    $attachments = Attachment::all();
     expect($attachments->pluck('original_name')->toArray())
         ->toContain('photo1.jpg')
         ->toContain('notes.pdf');
@@ -265,8 +265,8 @@ it('creates reply with file attachment via CommentItem component', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Parent comment</p>',
     ]);
 

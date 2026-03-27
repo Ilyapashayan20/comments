@@ -1,25 +1,26 @@
 <?php
 
-namespace Relaticle\Comments;
+namespace Relaticle\Comments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
+use Relaticle\Comments\CommentsConfig;
 
-class CommentSubscription extends Model
+class Subscription extends Model
 {
     public const UPDATED_AT = null;
 
     protected $fillable = [
         'commentable_type',
         'commentable_id',
-        'user_type',
-        'user_id',
+        'commenter_type',
+        'commenter_id',
     ];
 
     public function getTable(): string
     {
-        return 'comment_subscriptions';
+        return CommentsConfig::getTableName('subscriptions');
     }
 
     public function commentable(): MorphTo
@@ -27,7 +28,7 @@ class CommentSubscription extends Model
         return $this->morphTo();
     }
 
-    public function user(): MorphTo
+    public function commenter(): MorphTo
     {
         return $this->morphTo();
     }
@@ -37,8 +38,8 @@ class CommentSubscription extends Model
         return static::where([
             'commentable_type' => $commentable->getMorphClass(),
             'commentable_id' => $commentable->getKey(),
-            'user_type' => $user->getMorphClass(),
-            'user_id' => $user->getKey(),
+            'commenter_type' => $user->getMorphClass(),
+            'commenter_id' => $user->getKey(),
         ])->exists();
     }
 
@@ -47,8 +48,8 @@ class CommentSubscription extends Model
         static::firstOrCreate([
             'commentable_type' => $commentable->getMorphClass(),
             'commentable_id' => $commentable->getKey(),
-            'user_type' => $user->getMorphClass(),
-            'user_id' => $user->getKey(),
+            'commenter_type' => $user->getMorphClass(),
+            'commenter_id' => $user->getKey(),
         ]);
     }
 
@@ -57,8 +58,8 @@ class CommentSubscription extends Model
         static::where([
             'commentable_type' => $commentable->getMorphClass(),
             'commentable_id' => $commentable->getKey(),
-            'user_type' => $user->getMorphClass(),
-            'user_id' => $user->getKey(),
+            'commenter_type' => $user->getMorphClass(),
+            'commenter_id' => $user->getKey(),
         ])->delete();
     }
 
@@ -68,6 +69,6 @@ class CommentSubscription extends Model
         return static::where([
             'commentable_type' => $commentable->getMorphClass(),
             'commentable_id' => $commentable->getKey(),
-        ])->with('user')->get()->pluck('user')->filter()->values();
+        ])->with('commenter')->get()->pluck('commenter')->filter()->values();
     }
 }

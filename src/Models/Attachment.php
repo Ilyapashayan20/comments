@@ -1,13 +1,14 @@
 <?php
 
-namespace Relaticle\Comments;
+namespace Relaticle\Comments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Number;
+use Relaticle\Comments\CommentsConfig;
 
-class CommentAttachment extends Model
+class Attachment extends Model
 {
     protected $fillable = [
         'comment_id',
@@ -20,12 +21,12 @@ class CommentAttachment extends Model
 
     public function getTable(): string
     {
-        return 'comment_attachments';
+        return CommentsConfig::getTableName('attachments');
     }
 
     public function comment(): BelongsTo
     {
-        return $this->belongsTo(Config::getCommentModel());
+        return $this->belongsTo(CommentsConfig::getCommentModel());
     }
 
     public function isImage(): bool

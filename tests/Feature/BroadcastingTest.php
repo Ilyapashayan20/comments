@@ -2,11 +2,11 @@
 
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Events\CommentCreated;
 use Relaticle\Comments\Events\CommentDeleted;
 use Relaticle\Comments\Events\CommentReacted;
 use Relaticle\Comments\Events\CommentUpdated;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -17,8 +17,8 @@ it('CommentCreated event implements ShouldBroadcast', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentCreated($comment);
@@ -33,8 +33,8 @@ it('CommentUpdated event implements ShouldBroadcast', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentUpdated($comment);
@@ -49,8 +49,8 @@ it('CommentDeleted event implements ShouldBroadcast', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentDeleted($comment);
@@ -65,8 +65,8 @@ it('CommentReacted event implements ShouldBroadcast', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentReacted($comment, $user, 'thumbs_up', 'added');
@@ -81,8 +81,8 @@ it('broadcastOn returns PrivateChannel with correct channel name', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentCreated($comment);
@@ -100,8 +100,8 @@ it('broadcastWhen returns false when broadcasting is disabled', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentCreated($comment);
@@ -118,8 +118,8 @@ it('broadcastWhen returns true when broadcasting is enabled', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentCreated($comment);
@@ -134,8 +134,8 @@ it('broadcastWith returns array with comment_id for CommentCreated', function ()
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentCreated($comment);
@@ -154,8 +154,8 @@ it('broadcastWith returns array with comment_id, reaction, and action for Commen
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentReacted($comment, $user, 'thumbs_up', 'added');
@@ -176,8 +176,8 @@ it('uses custom channel prefix from config in broadcastOn', function () {
     $comment = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $event = new CommentCreated($comment);

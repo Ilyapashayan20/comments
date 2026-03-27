@@ -1,8 +1,8 @@
 <?php
 
 use Livewire\Livewire;
-use Relaticle\Comments\CommentSubscription;
 use Relaticle\Comments\Livewire\Comments;
+use Relaticle\Comments\Models\Subscription;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -12,35 +12,35 @@ it('subscribes user when toggling from unsubscribed state', function () {
 
     $this->actingAs($user);
 
-    expect(CommentSubscription::isSubscribed($post, $user))->toBeFalse();
+    expect(Subscription::isSubscribed($post, $user))->toBeFalse();
 
     Livewire::test(Comments::class, ['model' => $post])
         ->call('toggleSubscription');
 
-    expect(CommentSubscription::isSubscribed($post, $user))->toBeTrue();
+    expect(Subscription::isSubscribed($post, $user))->toBeTrue();
 });
 
 it('unsubscribes user when toggling from subscribed state', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $user);
+    Subscription::subscribe($post, $user);
 
     $this->actingAs($user);
 
-    expect(CommentSubscription::isSubscribed($post, $user))->toBeTrue();
+    expect(Subscription::isSubscribed($post, $user))->toBeTrue();
 
     Livewire::test(Comments::class, ['model' => $post])
         ->call('toggleSubscription');
 
-    expect(CommentSubscription::isSubscribed($post, $user))->toBeFalse();
+    expect(Subscription::isSubscribed($post, $user))->toBeFalse();
 });
 
 it('returns true for isSubscribed computed when user is subscribed', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $user);
+    Subscription::subscribe($post, $user);
 
     $this->actingAs($user);
 
@@ -64,7 +64,7 @@ it('renders Subscribed text for subscribed user', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();
 
-    CommentSubscription::subscribe($post, $user);
+    Subscription::subscribe($post, $user);
 
     $this->actingAs($user);
 

@@ -3,7 +3,7 @@
 namespace Relaticle\Comments\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Relaticle\Comments\Comment;
+use Relaticle\Comments\Models\Comment;
 
 class CommentFactory extends Factory
 {

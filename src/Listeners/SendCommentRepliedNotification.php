@@ -3,35 +3,35 @@
 namespace Relaticle\Comments\Listeners;
 
 use Illuminate\Support\Facades\Notification;
-use Relaticle\Comments\CommentSubscription;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Events\CommentCreated;
+use Relaticle\Comments\Models\Subscription;
 use Relaticle\Comments\Notifications\CommentRepliedNotification;
 
 class SendCommentRepliedNotification
 {
     public function handle(CommentCreated $event): void
     {
-        if (! Config::areNotificationsEnabled()) {
+        if (! CommentsConfig::areNotificationsEnabled()) {
             return;
         }
 
         $comment = $event->comment;
         $commentable = $event->commentable;
 
-        if (Config::shouldAutoSubscribe()) {
-            CommentSubscription::subscribe($commentable, $comment->user);
+        if (CommentsConfig::shouldAutoSubscribe()) {
+            Subscription::subscribe($commentable, $comment->commenter);
         }
 
         if (! $comment->isReply()) {
             return;
         }
 
-        $subscribers = CommentSubscription::subscribersFor($commentable);
+        $subscribers = Subscription::subscribersFor($commentable);
 
         $recipients = $subscribers->filter(function ($user) use ($comment) {
-            return ! ($user->getMorphClass() === $comment->user->getMorphClass()
-                && $user->getKey() === $comment->user->getKey());
+            return ! ($user->getMorphClass() === $comment->commenter->getMorphClass()
+                && $user->getKey() === $comment->commenter->getKey());
         });
 
         if ($recipients->isEmpty()) {

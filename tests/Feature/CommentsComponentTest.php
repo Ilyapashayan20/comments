@@ -1,8 +1,8 @@
 <?php
 
 use Livewire\Livewire;
-use Relaticle\Comments\Comment;
 use Relaticle\Comments\Livewire\Comments;
+use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
@@ -33,8 +33,8 @@ it('associates new comment with the authenticated user', function () {
 
     $comment = Comment::first();
 
-    expect($comment->user_id)->toBe($user->id);
-    expect($comment->user_type)->toBe($user->getMorphClass());
+    expect($comment->commenter_id)->toBe($user->id);
+    expect($comment->commenter_type)->toBe($user->getMorphClass());
     expect($comment->commentable_id)->toBe($post->id);
     expect($comment->commentable_type)->toBe($post->getMorphClass());
 });
@@ -71,8 +71,8 @@ it('paginates top-level comments with load more', function () {
     Comment::factory()->count(12)->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -99,8 +99,8 @@ it('hides load more button when all comments are loaded', function () {
     Comment::factory()->count(5)->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);
@@ -130,8 +130,8 @@ it('returns comments in correct sort order via computed property', function () {
     $older = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Older comment</p>',
         'created_at' => now()->subHour(),
     ]);
@@ -139,8 +139,8 @@ it('returns comments in correct sort order via computed property', function () {
     $newer = Comment::factory()->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
         'body' => '<p>Newer comment</p>',
         'created_at' => now(),
     ]);
@@ -167,8 +167,8 @@ it('displays total comment count', function () {
     Comment::factory()->count(3)->create([
         'commentable_id' => $post->id,
         'commentable_type' => $post->getMorphClass(),
-        'user_id' => $user->getKey(),
-        'user_type' => $user->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
     ]);
 
     $this->actingAs($user);

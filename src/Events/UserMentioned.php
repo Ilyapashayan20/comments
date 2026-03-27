@@ -5,7 +5,7 @@ namespace Relaticle\Comments\Events;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Relaticle\Comments\Comment;
+use Relaticle\Comments\Models\Comment;
 
 class UserMentioned
 {

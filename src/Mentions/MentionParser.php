@@ -3,10 +3,10 @@
 namespace Relaticle\Comments\Mentions;
 
 use Illuminate\Support\Collection;
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Contracts\MentionResolver;
 use Relaticle\Comments\Events\UserMentioned;
+use Relaticle\Comments\Models\Comment;
 
 class MentionParser
 {
@@ -33,13 +33,13 @@ class MentionParser
     public function syncMentions(Comment $comment): void
     {
         $newMentionIds = $this->parse($comment->body);
-        $existingMentionIds = $comment->mentions()->pluck('comment_mentions.user_id');
+        $existingMentionIds = $comment->mentions()->pluck('comment_mentions.commenter_id');
 
         $addedIds = $newMentionIds->diff($existingMentionIds);
 
         $comment->mentions()->sync($newMentionIds->all());
 
-        $commenterModel = Config::getCommenterModel();
+        $commenterModel = CommentsConfig::getCommenterModel();
 
         $addedIds->each(function ($userId) use ($comment, $commenterModel) {
             $mentionedUser = $commenterModel::find($userId);
