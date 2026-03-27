@@ -32,13 +32,13 @@
 
             {{-- Body or edit form --}}
             @if ($isEditing)
-                <form wire:submit="saveEdit" class="mt-1">
+                <div class="mt-1">
                     {{ $this->editForm }}
                     <div class="mt-2 flex gap-2">
-                        <button type="submit" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Save</button>
+                        <button type="button" wire:click="saveEdit" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Save</button>
                         <button type="button" wire:click="cancelEdit" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
                     </div>
-                </form>
+                </div>
             @else
                 <div class="fi-prose prose prose-sm mt-1 max-w-none text-gray-700 dark:prose-invert dark:text-gray-300">
                     {!! $comment->renderBodyWithMentions() !!}
@@ -104,7 +104,7 @@
 
         {{-- Reply form --}}
         @if ($isReplying)
-            <form wire:submit="addReply" class="mt-3">
+            <div class="mt-3">
                 {{ $this->replyForm }}
 
                 @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
@@ -135,10 +135,10 @@
                 @endif
 
                 <div class="mt-2 flex gap-2">
-                    <button type="submit" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Reply</button>
+                    <button type="button" wire:click="addReply" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Reply</button>
                     <button type="button" wire:click="cancelReply" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancel</button>
                 </div>
-            </form>
+            </div>
         @endif
 
         {{-- Nested replies --}}

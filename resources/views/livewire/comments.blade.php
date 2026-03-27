@@ -60,7 +60,7 @@
     {{-- New comment form - only for authorized users --}}
     @auth
         @can('create', \Relaticle\Comments\CommentsConfig::getCommentModel())
-            <form wire:submit="addComment" class="mt-4">
+            <div class="mt-4">
                 {{ $this->commentForm }}
 
                 @if (\Relaticle\Comments\CommentsConfig::areAttachmentsEnabled())
@@ -91,14 +91,14 @@
                 @endif
 
                 <div class="mt-2 flex justify-end">
-                    <button type="submit"
+                    <button type="button" wire:click="addComment"
                         class="inline-flex items-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-500 dark:hover:bg-primary-400 dark:focus:ring-offset-gray-800"
                         wire:loading.attr="disabled" wire:target="addComment">
                         <span wire:loading.remove wire:target="addComment">Comment</span>
                         <span wire:loading wire:target="addComment">Posting...</span>
                     </button>
                 </div>
-            </form>
+            </div>
         @endcan
     @endauth
 </div>
