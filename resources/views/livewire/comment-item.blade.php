@@ -33,9 +33,11 @@
             {{-- Body or edit form --}}
             @if ($isEditing)
                 <form wire:submit="saveEdit" class="mt-1">
-                    <textarea wire:model="editBody" rows="3"
-                        class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 sm:text-sm"
-                    ></textarea>
+                    <x-filament::input.wrapper>
+                        <textarea wire:model="editBody" rows="3"
+                            class="block w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 dark:text-white dark:placeholder:text-gray-500"
+                        ></textarea>
+                    </x-filament::input.wrapper>
                     @error('editBody')
                         <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                     @enderror
@@ -167,14 +169,16 @@
                         });
                     }
                 }">
-                <textarea x-ref="replyInput"
-                    wire:model="replyBody"
-                    @input="handleInput($event)"
-                    @keydown="handleKeydown($event)"
-                    rows="2"
-                    placeholder="Write a reply..."
-                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400 sm:text-sm"
-                ></textarea>
+                <x-filament::input.wrapper>
+                    <textarea x-ref="replyInput"
+                        wire:model="replyBody"
+                        @input="handleInput($event)"
+                        @keydown="handleKeydown($event)"
+                        rows="2"
+                        placeholder="Write a reply..."
+                        class="block w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 dark:text-white dark:placeholder:text-gray-500"
+                    ></textarea>
+                </x-filament::input.wrapper>
 
                 {{-- Mention autocomplete dropdown --}}
                 <div x-show="showMentions" x-cloak

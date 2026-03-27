@@ -37,6 +37,14 @@ Drop-in integration with any Filament resource.
   :::
 ::
 
+::callout{icon="i-lucide-triangle-alert" color="amber"}
+**Alpha Software** -- This package is currently in alpha. The API is not stable and breaking changes may occur between releases without prior notice. Do not use in production unless you are prepared to handle upgrades manually.
+::
+
+<div class="max-w-5xl mx-auto mt-8">
+  <img src="/preview.png" alt="Comments - threaded discussions in Filament" class="rounded-lg shadow-lg w-full" />
+</div>
+
 ::u-page-section
 #title
 Why choose Comments?

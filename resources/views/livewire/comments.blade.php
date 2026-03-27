@@ -118,15 +118,17 @@
                         });
                     }
                 }">
-                <textarea
-                    x-ref="commentInput"
-                    wire:model="newComment"
-                    @input="handleInput($event)"
-                    @keydown="handleKeydown($event)"
-                    rows="3"
-                    placeholder="Write a comment..."
-                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder-gray-400 sm:text-sm"
-                ></textarea>
+                <x-filament::input.wrapper>
+                    <textarea
+                        x-ref="commentInput"
+                        wire:model="newComment"
+                        @input="handleInput($event)"
+                        @keydown="handleKeydown($event)"
+                        rows="3"
+                        placeholder="Write a comment..."
+                        class="block w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 dark:text-white dark:placeholder:text-gray-500"
+                    ></textarea>
+                </x-filament::input.wrapper>
 
                 {{-- Mention autocomplete dropdown --}}
                 <div x-show="showMentions" x-cloak
