@@ -142,7 +142,7 @@
         @endif
 
         {{-- Nested replies --}}
-        @if ($comment->replies->isNotEmpty())
+        @if ($comment->relationLoaded('replies') && $comment->replies->isNotEmpty())
             <div class="mt-3 space-y-3 border-l-2 border-gray-200 pl-4 dark:border-gray-700">
                 @foreach ($comment->replies as $reply)
                     <livewire:comment-item :comment="$reply" :key="'comment-'.$reply->id" />
