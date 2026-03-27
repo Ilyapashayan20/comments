@@ -8,7 +8,7 @@ A full-featured commenting system for Filament panels with threaded replies, @me
 [![Total Downloads](https://img.shields.io/packagist/dt/relaticle/comments.svg?style=for-the-badge)](https://packagist.org/packages/relaticle/comments)
 [![PHP 8.2+](https://img.shields.io/badge/php-8.2%2B-blue.svg?style=for-the-badge)](https://php.net)
 [![Laravel 12+](https://img.shields.io/badge/laravel-12%2B-red.svg?style=for-the-badge)](https://laravel.com)
-[![Tests](https://img.shields.io/github/actions/workflow/status/relaticle/comments/tests.yml?branch=main&style=for-the-badge&label=tests)](https://github.com/relaticle/comments/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/relaticle/comments/tests.yml?branch=1.x&style=for-the-badge&label=tests)](https://github.com/relaticle/comments/actions)
 
 
 ## Features
