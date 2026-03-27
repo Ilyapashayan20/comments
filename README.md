@@ -61,12 +61,12 @@ class Project extends Model implements Commentable
 Add the commenter trait to your User model:
 
 ```php
-use Relaticle\Comments\Concerns\IsCommenter;
-use Relaticle\Comments\Contracts\Commenter;
+use Relaticle\Comments\Concerns\CanComment;
+use Relaticle\Comments\Contracts\Commentator;
 
-class User extends Authenticatable implements Commenter
+class User extends Authenticatable implements Commentator
 {
-    use IsCommenter;
+    use CanComment;
 }
 ```
 

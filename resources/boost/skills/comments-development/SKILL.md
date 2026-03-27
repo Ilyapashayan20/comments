@@ -31,12 +31,12 @@ class Project extends Model implements Commentable
 ```
 
 ```php
-use Relaticle\Comments\Concerns\IsCommenter;
-use Relaticle\Comments\Contracts\Commenter;
+use Relaticle\Comments\Concerns\CanComment;
+use Relaticle\Comments\Contracts\Commentator;
 
-class User extends Authenticatable implements Commenter
+class User extends Authenticatable implements Commentator
 {
-    use IsCommenter;
+    use CanComment;
 }
 ```
 
@@ -113,7 +113,7 @@ Publish config: `php artisan vendor:publish --tag=comments-config`
 
 | Key | Default | Purpose |
 |-----|---------|---------|
-| `tables.comments` | `'comments'` | Main comments table name |
+| `table_names.comments` | `'comments'` | Main comments table name |
 | `models.comment` | `Comment::class` | Comment model class |
 | `commenter.model` | `User::class` | Commenter (user) model class |
 | `policy` | `CommentPolicy::class` | Authorization policy class |
@@ -183,14 +183,14 @@ Default `CommentPolicy` methods:
 ```php
 namespace App\Policies;
 
-use Relaticle\Comments\Comment;
-use Relaticle\Comments\Contracts\Commenter;
+use Relaticle\Comments\Models\Comment;
+use Relaticle\Comments\Contracts\Commentator;
 
 class CustomCommentPolicy
 {
-    public function delete(Commenter $user, Comment $comment): bool
+    public function delete(Commentator $user, Comment $comment): bool
     {
-        return $comment->user_id === $user->getKey()
+        return $comment->commenter_id === $user->getKey()
             || $user->hasRole('admin');
     }
 }
@@ -201,10 +201,10 @@ class CustomCommentPolicy
 ### Scoped Comments (Multi-tenancy)
 
 ```php
-use Relaticle\Comments\Config;
+use Relaticle\Comments\CommentsConfig;
 
 // In AppServiceProvider::boot()
-Config::resolveAuthenticatedUserUsing(function () {
+CommentsConfig::resolveAuthenticatedUserUsing(function () {
     return auth()->user();
 });
 ```
@@ -276,7 +276,7 @@ $model->commentCount();       // Total count
 
 // On Comment model
 $comment->commentable();      // Parent model (morphTo)
-$comment->user();             // Commenter (morphTo)
+$comment->commenter();        // Commenter (morphTo)
 $comment->parent();           // Parent comment (belongsTo)
 $comment->replies();          // Child comments (hasMany)
 $comment->reactions();        // Reactions (hasMany)
