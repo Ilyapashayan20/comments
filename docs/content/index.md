@@ -125,6 +125,8 @@ Extend your Laravel applications with our ecosystem of complementary tools
     to: https://filaforms.app
     target: _blank
     ---
+    :img{src="https://filaforms.app/img/og-image.png" alt="FilaForms" class="mb-4 rounded-lg w-full pointer-events-none"}
+
     Visual form builder for all your public-facing forms.
     :::
 
@@ -135,6 +137,8 @@ Extend your Laravel applications with our ecosystem of complementary tools
     to: https://relaticle.github.io/custom-fields
     target: _blank
     ---
+    :img{src="https://relaticle.github.io/custom-fields/og-image.png" alt="Custom Fields" class="mb-4 rounded-lg w-full pointer-events-none"}
+
     Let users add custom fields to any model without code changes.
     :::
   ::
