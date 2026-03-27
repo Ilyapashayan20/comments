@@ -16,7 +16,7 @@ it('renders mention with styled span', function () {
         'commentable_type' => $post->getMorphClass(),
         'commenter_id' => $user->getKey(),
         'commenter_type' => $user->getMorphClass(),
-        'body' => '<p>@Alice said hi</p>',
+        'body' => '@Alice said hi',
     ]);
 
     $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);
@@ -38,7 +38,7 @@ it('renders multiple mentions with styled spans', function () {
         'commentable_type' => $post->getMorphClass(),
         'commenter_id' => $user->getKey(),
         'commenter_type' => $user->getMorphClass(),
-        'body' => '<p>@Alice and @Bob</p>',
+        'body' => '@Alice and @Bob',
     ]);
 
     $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);
@@ -60,7 +60,7 @@ it('does not style non-mentioned @text', function () {
         'commentable_type' => $post->getMorphClass(),
         'commenter_id' => $user->getKey(),
         'commenter_type' => $user->getMorphClass(),
-        'body' => '<p>@ghost is not here</p>',
+        'body' => '@ghost is not here',
     ]);
 
     $rendered = $comment->renderBodyWithMentions();
@@ -78,7 +78,7 @@ it('renders comment-mention class in Livewire component', function () {
         'commentable_type' => $post->getMorphClass(),
         'commenter_id' => $user->getKey(),
         'commenter_type' => $user->getMorphClass(),
-        'body' => '<p>Hello @Alice</p>',
+        'body' => 'Hello @Alice',
     ]);
 
     $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);

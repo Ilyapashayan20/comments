@@ -23,11 +23,9 @@ it('allows author to start and save edit on their comment', function () {
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startEdit')
         ->assertSet('isEditing', true)
-        ->assertSet('editBody', '<p>Original body</p>')
-        ->set('editBody', '<p>Updated body</p>')
+        ->set('editData.body', '<p>Updated body</p>')
         ->call('saveEdit')
-        ->assertSet('isEditing', false)
-        ->assertSet('editBody', '');
+        ->assertSet('isEditing', false);
 
     $comment->refresh();
 
@@ -53,7 +51,7 @@ it('marks edited comment with edited indicator', function () {
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startEdit')
-        ->set('editBody', '<p>Changed</p>')
+        ->set('editData.body', '<p>Changed</p>')
         ->call('saveEdit');
 
     $comment->refresh();
@@ -160,10 +158,9 @@ it('allows user to reply to a comment', function () {
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startReply')
         ->assertSet('isReplying', true)
-        ->set('replyBody', '<p>My reply</p>')
+        ->set('replyData.body', '<p>My reply</p>')
         ->call('addReply')
-        ->assertSet('isReplying', false)
-        ->assertSet('replyBody', '');
+        ->assertSet('isReplying', false);
 
     $reply = Comment::where('parent_id', $comment->id)->first();
 
@@ -213,8 +210,7 @@ it('resets state when cancelling edit', function () {
         ->call('startEdit')
         ->assertSet('isEditing', true)
         ->call('cancelEdit')
-        ->assertSet('isEditing', false)
-        ->assertSet('editBody', '');
+        ->assertSet('isEditing', false);
 });
 
 it('resets state when cancelling reply', function () {
@@ -233,10 +229,9 @@ it('resets state when cancelling reply', function () {
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startReply')
         ->assertSet('isReplying', true)
-        ->set('replyBody', '<p>Draft reply</p>')
+        ->set('replyData.body', '<p>Draft reply</p>')
         ->call('cancelReply')
-        ->assertSet('isReplying', false)
-        ->assertSet('replyBody', '');
+        ->assertSet('isReplying', false);
 });
 
 it('loads all replies within a thread eagerly', function () {

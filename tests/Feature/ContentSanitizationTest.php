@@ -162,7 +162,7 @@ it('sanitizes content submitted through livewire component', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Hello</p><script>alert("xss")</script>')
+        ->set('commentData.body', '<p>Hello</p><script>alert("xss")</script>')
         ->call('addComment');
 
     $comment = Comment::first();

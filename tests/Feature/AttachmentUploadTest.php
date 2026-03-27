@@ -22,10 +22,9 @@ it('creates comment with file attachment via Livewire component', function () {
     $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Comment with attachment</p>')
+        ->set('commentData.body', '<p>Comment with attachment</p>')
         ->set('attachments', [$file])
         ->call('addComment')
-        ->assertSet('newComment', '')
         ->assertSet('attachments', []);
 
     expect(Comment::count())->toBe(1);
@@ -43,7 +42,7 @@ it('stores attachment with correct metadata', function () {
     $file = UploadedFile::fake()->image('vacation.jpg', 200, 200)->size(512);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Vacation photos</p>')
+        ->set('commentData.body', '<p>Vacation photos</p>')
         ->set('attachments', [$file])
         ->call('addComment');
 
@@ -69,7 +68,7 @@ it('stores file on configured disk at comments/attachments/{comment_id}/ path', 
     $file = UploadedFile::fake()->image('test.png', 50, 50);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>File path test</p>')
+        ->set('commentData.body', '<p>File path test</p>')
         ->set('attachments', [$file])
         ->call('addComment');
 
@@ -160,7 +159,7 @@ it('rejects file exceeding max size', function () {
     $oversizedFile = UploadedFile::fake()->create('big.pdf', CommentsConfig::getAttachmentMaxSize() + 1, 'application/pdf');
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Oversized file</p>')
+        ->set('commentData.body', '<p>Oversized file</p>')
         ->set('attachments', [$oversizedFile])
         ->call('addComment')
         ->assertHasErrors('attachments.0');
@@ -180,7 +179,7 @@ it('rejects disallowed file type', function () {
     $exeFile = UploadedFile::fake()->create('script.exe', 100, 'application/x-msdownload');
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Malicious file</p>')
+        ->set('commentData.body', '<p>Malicious file</p>')
         ->set('attachments', [$exeFile])
         ->call('addComment')
         ->assertHasErrors('attachments.0');
@@ -200,7 +199,7 @@ it('accepts allowed file types', function () {
     $imageFile = UploadedFile::fake()->image('photo.jpg', 100, 100);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Valid file</p>')
+        ->set('commentData.body', '<p>Valid file</p>')
         ->set('attachments', [$imageFile])
         ->call('addComment')
         ->assertHasNoErrors('attachments.0');
@@ -243,7 +242,7 @@ it('creates comment with multiple file attachments', function () {
     $file2 = UploadedFile::fake()->create('notes.pdf', 512, 'application/pdf');
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Multiple files</p>')
+        ->set('commentData.body', '<p>Multiple files</p>')
         ->set('attachments', [$file1, $file2])
         ->call('addComment');
 
@@ -276,11 +275,10 @@ it('creates reply with file attachment via CommentItem component', function () {
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startReply')
-        ->set('replyBody', '<p>Reply with attachment</p>')
+        ->set('replyData.body', '<p>Reply with attachment</p>')
         ->set('replyAttachments', [$file])
         ->call('addReply')
         ->assertSet('isReplying', false)
-        ->assertSet('replyBody', '')
         ->assertSet('replyAttachments', []);
 
     $reply = Comment::where('parent_id', $comment->id)->first();

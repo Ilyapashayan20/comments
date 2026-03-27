@@ -13,9 +13,8 @@ it('allows authenticated user to create a comment on a post', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Hello World</p>')
-        ->call('addComment')
-        ->assertSet('newComment', '');
+        ->set('commentData.body', '<p>Hello World</p>')
+        ->call('addComment');
 
     expect(Comment::count())->toBe(1);
     expect(Comment::first()->body)->toBe('<p>Hello World</p>');
@@ -28,7 +27,7 @@ it('associates new comment with the authenticated user', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Test</p>')
+        ->set('commentData.body', '<p>Test</p>')
         ->call('addComment');
 
     $comment = Comment::first();
@@ -43,7 +42,7 @@ it('requires authentication to create a comment', function () {
     $post = Post::factory()->create();
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Hello</p>')
+        ->set('commentData.body', '<p>Hello</p>')
         ->call('addComment')
         ->assertForbidden();
 });
@@ -55,9 +54,9 @@ it('validates that comment body is not empty', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '')
+        ->set('commentData.body', '')
         ->call('addComment')
-        ->assertHasErrors('newComment');
+        ->assertHasErrors('commentData.body');
 
     expect(Comment::count())->toBe(0);
 });

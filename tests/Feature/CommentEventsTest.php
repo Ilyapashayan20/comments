@@ -20,7 +20,7 @@ it('fires CommentCreated event when adding a comment', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>New comment</p>')
+        ->set('commentData.body', '<p>New comment</p>')
         ->call('addComment');
 
     Event::assertDispatched(CommentCreated::class, function (CommentCreated $event) use ($post) {
@@ -47,7 +47,7 @@ it('fires CommentUpdated event when editing a comment', function () {
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startEdit')
-        ->set('editBody', '<p>Edited</p>')
+        ->set('editData.body', '<p>Edited</p>')
         ->call('saveEdit');
 
     Event::assertDispatched(CommentUpdated::class, function (CommentUpdated $event) use ($comment) {
@@ -95,7 +95,7 @@ it('fires CommentCreated event when adding a reply', function () {
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startReply')
-        ->set('replyBody', '<p>Reply text</p>')
+        ->set('replyData.body', '<p>Reply text</p>')
         ->call('addReply');
 
     Event::assertDispatched(CommentCreated::class, function (CommentCreated $event) use ($comment) {
@@ -113,7 +113,7 @@ it('carries correct comment and commentable in event payload', function () {
     $this->actingAs($user);
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', '<p>Payload test</p>')
+        ->set('commentData.body', '<p>Payload test</p>')
         ->call('addComment');
 
     Event::assertDispatched(CommentCreated::class, function (CommentCreated $event) use ($post, $user) {

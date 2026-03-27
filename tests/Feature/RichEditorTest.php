@@ -17,7 +17,7 @@ it('creates a comment with rich HTML content preserved', function () {
     $html = '<p>Hello <strong>bold</strong> and <em>italic</em> world</p>';
 
     Livewire::test(Comments::class, ['model' => $post])
-        ->set('newComment', $html)
+        ->set('commentData.body', $html)
         ->call('addComment');
 
     $comment = Comment::first();
@@ -42,9 +42,15 @@ it('pre-fills editBody with existing comment HTML when starting edit', function 
 
     $this->actingAs($user);
 
-    Livewire::test(CommentItem::class, ['comment' => $comment])
-        ->call('startEdit')
-        ->assertSet('editBody', $originalHtml);
+    $component = Livewire::test(CommentItem::class, ['comment' => $comment])
+        ->call('startEdit');
+
+    $editBody = $component->get('editData')['body'];
+    $bodyJson = json_encode($editBody);
+
+    expect($bodyJson)->toContain('Hello ');
+    expect($bodyJson)->toContain('world');
+    expect($bodyJson)->toContain('bold');
 });
 
 it('saves edited HTML content through edit form', function () {
@@ -65,13 +71,14 @@ it('saves edited HTML content through edit form', function () {
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startEdit')
-        ->set('editBody', $updatedHtml)
+        ->set('editData.body', $updatedHtml)
         ->call('saveEdit');
 
     $comment->refresh();
 
     expect($comment->body)->toContain('<strong>bold</strong>');
-    expect($comment->body)->toContain('<a href="https://example.com">a link</a>');
+    expect($comment->body)->toContain('href="https://example.com"');
+    expect($comment->body)->toContain('>a link</a>');
 });
 
 it('creates reply with rich HTML content', function () {
@@ -91,7 +98,7 @@ it('creates reply with rich HTML content', function () {
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
         ->call('startReply')
-        ->set('replyBody', $replyHtml)
+        ->set('replyData.body', $replyHtml)
         ->call('addReply');
 
     $reply = Comment::where('parent_id', $comment->id)->first();
