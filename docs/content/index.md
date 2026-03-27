@@ -14,6 +14,10 @@ A full-featured commenting system for Filament panels with threaded replies, @me
 
 Drop-in integration with any Filament resource.
 
+:::alert{type="warning"}
+**Alpha Software** — Breaking changes may occur between releases. Not recommended for production use.
+:::
+
 #links
   :::u-button
   ---
@@ -41,10 +45,6 @@ Drop-in integration with any Filament resource.
   <div class="aspect-video rounded-lg shadow-lg overflow-hidden">
     <img src="/preview.png" alt="Comments - threaded discussions in Filament" class="w-full h-full object-cover object-top" />
   </div>
-</div>
-
-<div class="text-center mt-4 text-sm text-amber-600 dark:text-amber-400">
-  <strong>Alpha Software</strong> — Breaking changes may occur between releases. Not recommended for production use.
 </div>
 
 ::u-page-section
