@@ -2,6 +2,8 @@
 
 namespace Relaticle\Comments;
 
+use Filament\Support\Assets\Css;
+use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -64,5 +66,9 @@ class CommentsServiceProvider extends PackageServiceProvider
         Livewire::component('comments', Comments::class);
         Livewire::component('comment-item', CommentItem::class);
         Livewire::component('reactions', Reactions::class);
+
+        FilamentAsset::register([
+            Css::make('comments', __DIR__.'/../resources/css/comments.css'),
+        ], 'relaticle/comments');
     }
 }
