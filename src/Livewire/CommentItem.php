@@ -180,7 +180,7 @@ class CommentItem extends Component implements HasForms
 
         app(MentionParser::class)->syncMentions($reply);
 
-        $this->comment->load(['replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter']);
+        $this->comment->load(['replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter', 'replies.replies.commenter', 'replies.replies.mentions', 'replies.replies.attachments', 'replies.replies.reactions.commenter']);
 
         $this->dispatch('commentUpdated');
 

@@ -68,7 +68,7 @@ class Comments extends Component implements HasForms
     {
         return $this->model
             ->topLevelComments()
-            ->with(['commenter', 'mentions', 'attachments', 'reactions.commenter', 'replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter'])
+            ->with(['commenter', 'mentions', 'attachments', 'reactions.commenter', 'replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter', 'replies.replies.commenter', 'replies.replies.mentions', 'replies.replies.attachments', 'replies.replies.reactions.commenter'])
             ->orderBy('created_at', $this->sortDirection)
             ->take($this->loadedCount)
             ->get();
