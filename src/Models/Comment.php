@@ -151,7 +151,7 @@ class Comment extends Model
 
         foreach ($mentionNames as $name) {
             $escapedName = e($name);
-            $styledSpan = '<span class="comment-mention inline rounded bg-primary-50 px-1 font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">@'.$escapedName.'</span>';
+            $styledSpan = '<span class="comment-mention my-0 inline-block rounded bg-primary-50 px-1 font-medium whitespace-nowrap text-primary-600 dark:bg-primary-400/10 dark:text-primary-400">@'.$escapedName.'</span>';
 
             // Replace rich-editor mention spans (data-type="mention" with @Name as text content)
             $body = preg_replace(
