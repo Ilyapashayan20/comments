@@ -6,7 +6,7 @@
     {{-- Sort toggle --}}
     <div class="flex items-center justify-between">
         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Comments ({{ $this->totalCount }})
+            Comments ({{ $this->allCommentsCount }})
         </h3>
         @auth
             <div class="flex items-center gap-3">

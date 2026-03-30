@@ -81,6 +81,12 @@ class Comments extends Component implements HasForms
     }
 
     #[Computed]
+    public function allCommentsCount(): int
+    {
+        return $this->model->commentCount();
+    }
+
+    #[Computed]
     public function hasMore(): bool
     {
         return $this->totalCount > $this->loadedCount;
@@ -203,7 +209,7 @@ class Comments extends Component implements HasForms
 
     public function refreshComments(): void
     {
-        unset($this->comments, $this->totalCount, $this->hasMore);
+        unset($this->comments, $this->totalCount, $this->hasMore, $this->allCommentsCount);
     }
 
     public function render(): View

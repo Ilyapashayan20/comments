@@ -28,6 +28,10 @@ class Comment extends Model
             $comment->body = Str::sanitizeHtml($comment->body);
         });
 
+        static::deleting(function (self $comment): void {
+            $comment->replies()->each(fn ($reply) => $reply->delete());
+        });
+
         static::forceDeleting(function (self $comment): void {
             $comment->attachments()->delete();
             $comment->reactions()->delete();
