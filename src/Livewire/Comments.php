@@ -2,6 +2,8 @@
 
 namespace Relaticle\Comments\Livewire;
 
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -19,9 +21,10 @@ use Relaticle\Comments\Mentions\MentionParser;
 use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Models\Subscription;
 
-class Comments extends Component implements HasForms
+class Comments extends Component implements HasForms, HasActions
 {
     use InteractsWithForms;
+    use InteractsWithActions;
     use WithFileUploads;
 
     public Model $model;
