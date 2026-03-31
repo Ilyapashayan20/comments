@@ -18,6 +18,8 @@ use Relaticle\Comments\Livewire\Comments;
 use Relaticle\Comments\Livewire\Reactions;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class CommentsServiceProvider extends PackageServiceProvider
 {
@@ -50,6 +52,27 @@ class CommentsServiceProvider extends PackageServiceProvider
         $this->app->bind(
             MentionResolver::class,
             fn () => new (CommentsConfig::getMentionResolver())
+        );
+
+        $this->app->scoped(
+            'comments.html_sanitizer',
+            fn (): HtmlSanitizer => new HtmlSanitizer(
+                (new HtmlSanitizerConfig)
+                    ->allowSafeElements()
+                    ->allowRelativeLinks()
+                    ->allowRelativeMedias()
+                    ->allowAttribute('class', allowedElements: '*')
+                    ->allowAttribute('data-color', allowedElements: '*')
+                    ->allowAttribute('data-from-breakpoint', allowedElements: '*')
+                    ->allowAttribute('data-type', allowedElements: '*')
+                    ->allowAttribute('data-id', allowedElements: 'span')
+                    ->allowAttribute('data-label', allowedElements: 'span')
+                    ->allowAttribute('data-char', allowedElements: 'span')
+                    ->allowAttribute('style', allowedElements: '*')
+                    ->allowAttribute('width', allowedElements: 'img')
+                    ->allowAttribute('height', allowedElements: 'img')
+                    ->withMaxInputLength(500000)
+            ),
         );
     }
 

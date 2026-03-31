@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Database\Factories\CommentFactory;
 
@@ -23,7 +22,7 @@ class Comment extends Model
         parent::boot();
 
         static::saving(function (self $comment): void {
-            $comment->body = Str::sanitizeHtml($comment->body);
+            $comment->body = app('comments.html_sanitizer')->sanitize($comment->body);
         });
 
         static::deleting(function (self $comment): void {
@@ -153,16 +152,15 @@ class Comment extends Model
             $escapedName = e($name);
             $styledSpan = '<span class="comment-mention">@'.$escapedName.'</span>';
 
-            // Replace rich-editor mention spans (data-type="mention" with @Name as text content)
-            $body = preg_replace(
-                '/<(?:span|a)[^>]*data-type="mention"[^>]*>@?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/',
-                $styledSpan,
-                $body
-            );
+            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>@?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/';
 
-            // Replace plain-text mentions
-            $body = str_replace("&#64;{$name}", $styledSpan, $body);
-            $body = str_replace("@{$name}", $styledSpan, $body);
+            if (preg_match($pattern, $body)) {
+                $body = preg_replace($pattern, $styledSpan, $body);
+            } else {
+                // Fallback for plain-text mentions
+                $body = str_replace("&#64;{$name}", $styledSpan, $body);
+                $body = str_replace("@{$name}", $styledSpan, $body);
+            }
         }
 
         return $body;
