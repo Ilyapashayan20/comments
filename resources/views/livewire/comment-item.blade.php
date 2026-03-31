@@ -104,7 +104,11 @@
 
         {{-- Reply form --}}
         @if ($isReplying)
-            <div class="mt-3">
+            <div class="mt-3"
+                x-data="{ uploadError: null }"
+                x-on:livewire-upload-error.window="uploadError = '{{ __('File upload failed. The file may be too large or an unsupported type.') }}'"
+                x-on:livewire-upload-start.window="uploadError = null"
+            >
                 {{ $this->replyForm }}
 
                 @if (!empty($replyAttachments))
@@ -120,6 +124,7 @@
                     @error('replyAttachments.*')
                         <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                     @enderror
+                    <p x-show="uploadError" x-text="uploadError" class="mt-1 text-sm text-danger-600 dark:text-danger-400"></p>
                 @endif
 
                 <div class="mt-2 flex items-center justify-between">

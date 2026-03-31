@@ -2,6 +2,8 @@
 
 namespace Relaticle\Comments;
 
+use Filament\Support\Assets\Css;
+use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -16,6 +18,8 @@ use Relaticle\Comments\Livewire\Comments;
 use Relaticle\Comments\Livewire\Reactions;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class CommentsServiceProvider extends PackageServiceProvider
 {
@@ -49,6 +53,27 @@ class CommentsServiceProvider extends PackageServiceProvider
             MentionResolver::class,
             fn () => new (CommentsConfig::getMentionResolver())
         );
+
+        $this->app->scoped(
+            'comments.html_sanitizer',
+            fn (): HtmlSanitizer => new HtmlSanitizer(
+                (new HtmlSanitizerConfig)
+                    ->allowSafeElements()
+                    ->allowRelativeLinks()
+                    ->allowRelativeMedias()
+                    ->allowAttribute('class', allowedElements: '*')
+                    ->allowAttribute('data-color', allowedElements: '*')
+                    ->allowAttribute('data-from-breakpoint', allowedElements: '*')
+                    ->allowAttribute('data-type', allowedElements: '*')
+                    ->allowAttribute('data-id', allowedElements: 'span')
+                    ->allowAttribute('data-label', allowedElements: 'span')
+                    ->allowAttribute('data-char', allowedElements: 'span')
+                    ->allowAttribute('style', allowedElements: '*')
+                    ->allowAttribute('width', allowedElements: 'img')
+                    ->allowAttribute('height', allowedElements: 'img')
+                    ->withMaxInputLength(500000)
+            ),
+        );
     }
 
     public function packageBooted(): void
@@ -64,5 +89,9 @@ class CommentsServiceProvider extends PackageServiceProvider
         Livewire::component('comments', Comments::class);
         Livewire::component('comment-item', CommentItem::class);
         Livewire::component('reactions', Reactions::class);
+
+        FilamentAsset::register([
+            Css::make('comments', __DIR__.'/../resources/css/comments.css'),
+        ], 'relaticle/comments');
     }
 }

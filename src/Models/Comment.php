@@ -2,8 +2,6 @@
 
 namespace Relaticle\Comments\Models;
 
-use Filament\Forms\Components\RichEditor\MentionProvider;
-use Filament\Forms\Components\RichEditor\RichContentRenderer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Database\Factories\CommentFactory;
 
@@ -25,7 +22,11 @@ class Comment extends Model
         parent::boot();
 
         static::saving(function (self $comment): void {
-            $comment->body = Str::sanitizeHtml($comment->body);
+            $comment->body = app('comments.html_sanitizer')->sanitize($comment->body);
+        });
+
+        static::deleting(function (self $comment): void {
+            $comment->replies()->each(fn ($reply) => $reply->delete());
         });
 
         static::forceDeleting(function (self $comment): void {
@@ -145,33 +146,23 @@ class Comment extends Model
     {
         $body = $this->body;
 
-        if ($this->hasRichEditorMentions($body)) {
-            return RichContentRenderer::make($body)
-                ->mentions([
-                    MentionProvider::make('@')
-                        ->getLabelsUsing(fn (array $ids): array => CommentsConfig::getCommenterModel()::query()
-                            ->whereIn('id', $ids)
-                            ->pluck('name', 'id')
-                            ->all()),
-                ])
-                ->toHtml();
-        }
-
         $mentionNames = $this->mentions->pluck('name')->filter()->unique();
 
         foreach ($mentionNames as $name) {
             $escapedName = e($name);
-            $styledSpan = '<span class="comment-mention inline rounded bg-primary-50 px-1 font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">@'.$escapedName.'</span>';
+            $styledSpan = '<span class="comment-mention">@'.$escapedName.'</span>';
 
-            $body = str_replace("&#64;{$name}", $styledSpan, $body);
-            $body = str_replace("@{$name}", $styledSpan, $body);
+            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>@?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/';
+
+            if (preg_match($pattern, $body)) {
+                $body = preg_replace($pattern, $styledSpan, $body);
+            } else {
+                // Fallback for plain-text mentions
+                $body = str_replace("&#64;{$name}", $styledSpan, $body);
+                $body = str_replace("@{$name}", $styledSpan, $body);
+            }
         }
 
         return $body;
-    }
-
-    protected function hasRichEditorMentions(string $body): bool
-    {
-        return str_contains($body, 'data-type="mention"') || str_contains($body, '<p>') || str_contains($body, '<br');
     }
 }

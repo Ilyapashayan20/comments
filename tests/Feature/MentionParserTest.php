@@ -10,6 +10,17 @@ use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Tests\Models\Post;
 use Relaticle\Comments\Tests\Models\User;
 
+it('parses rich-editor mention spans using data-id', function () {
+    $john = User::factory()->create(['name' => 'john']);
+
+    $parser = app(MentionParser::class);
+    $body = '<p>Hello <span data-type="mention" data-id="'.$john->id.'" data-label="john" data-char="@">@john</span></p>';
+    $result = $parser->parse($body);
+
+    expect($result)->toHaveCount(1);
+    expect($result->first())->toBe($john->id);
+});
+
 it('parses @username from plain text body', function () {
     User::factory()->create(['name' => 'john']);
     User::factory()->create(['name' => 'jane']);

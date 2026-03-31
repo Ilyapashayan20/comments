@@ -155,6 +155,26 @@ it('strips onclick handler from elements', function () {
     expect($comment->body)->toContain('click me');
 });
 
+it('preserves mention data attributes in comment body', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()->create();
+
+    $body = '<span data-type="mention" data-id="1" data-label="max" data-char="@">@max</span>';
+
+    $comment = Comment::factory()->create([
+        'commentable_id' => $post->id,
+        'commentable_type' => $post->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
+        'body' => $body,
+    ]);
+
+    expect($comment->body)->toContain('data-type="mention"');
+    expect($comment->body)->toContain('data-id="1"');
+    expect($comment->body)->toContain('data-label="max"');
+    expect($comment->body)->toContain('data-char="@"');
+});
+
 it('sanitizes content submitted through livewire component', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();

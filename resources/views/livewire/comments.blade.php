@@ -2,11 +2,14 @@
     @if (!\Relaticle\Comments\CommentsConfig::isBroadcastingEnabled())
         wire:poll.{{ \Relaticle\Comments\CommentsConfig::getPollingInterval() }}
     @endif
+    x-data="{ uploadError: null }"
+    x-on:livewire-upload-error.window="uploadError = '{{ __('File upload failed. The file may be too large or an unsupported type.') }}'"
+    x-on:livewire-upload-start.window="uploadError = null"
 >
     {{-- Sort toggle --}}
     <div class="flex items-center justify-between">
         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Comments ({{ $this->totalCount }})
+            Comments ({{ $this->allCommentsCount }})
         </h3>
         @auth
             <div class="flex items-center gap-3">
@@ -76,6 +79,7 @@
                     @error('attachments.*')
                         <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p>
                     @enderror
+                    <p x-show="uploadError" x-text="uploadError" class="mt-1 text-sm text-danger-600 dark:text-danger-400"></p>
                 @endif
 
                 <div class="mt-2 flex items-center justify-between">

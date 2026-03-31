@@ -51,6 +51,28 @@ it('renders multiple mentions with styled spans', function () {
     expect($rendered)->toContain('comment-mention');
 });
 
+it('renders rich-editor mention span as styled mention', function () {
+    $user = User::factory()->create();
+    $alice = User::factory()->create(['name' => 'Alice']);
+    $post = Post::factory()->create();
+
+    $comment = Comment::factory()->create([
+        'commentable_id' => $post->id,
+        'commentable_type' => $post->getMorphClass(),
+        'commenter_id' => $user->getKey(),
+        'commenter_type' => $user->getMorphClass(),
+        'body' => '<p><span data-type="mention" data-id="'.$alice->id.'" data-label="Alice" data-char="@">@Alice</span> said hi</p>',
+    ]);
+
+    $comment->mentions()->attach($alice->id, ['commenter_type' => $alice->getMorphClass()]);
+
+    $rendered = $comment->renderBodyWithMentions();
+
+    expect($rendered)->toContain('comment-mention');
+    expect($rendered)->toContain('@Alice</span>');
+    expect($rendered)->not->toContain('data-type="mention"');
+});
+
 it('does not style non-mentioned @text', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create();

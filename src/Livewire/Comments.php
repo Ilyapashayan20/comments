@@ -2,6 +2,8 @@
 
 namespace Relaticle\Comments\Livewire;
 
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -19,9 +21,10 @@ use Relaticle\Comments\Mentions\MentionParser;
 use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Models\Subscription;
 
-class Comments extends Component implements HasForms
+class Comments extends Component implements HasForms, HasActions
 {
     use InteractsWithForms;
+    use InteractsWithActions;
     use WithFileUploads;
 
     public Model $model;
@@ -68,7 +71,7 @@ class Comments extends Component implements HasForms
     {
         return $this->model
             ->topLevelComments()
-            ->with(['commenter', 'mentions', 'attachments', 'reactions.commenter', 'replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter'])
+            ->with(['commenter', 'mentions', 'attachments', 'reactions.commenter', 'replies.commenter', 'replies.mentions', 'replies.attachments', 'replies.reactions.commenter', 'replies.replies.commenter', 'replies.replies.mentions', 'replies.replies.attachments', 'replies.replies.reactions.commenter'])
             ->orderBy('created_at', $this->sortDirection)
             ->take($this->loadedCount)
             ->get();
@@ -78,6 +81,12 @@ class Comments extends Component implements HasForms
     public function totalCount(): int
     {
         return $this->model->topLevelComments()->count();
+    }
+
+    #[Computed]
+    public function allCommentsCount(): int
+    {
+        return $this->model->commentCount();
     }
 
     #[Computed]
@@ -203,7 +212,7 @@ class Comments extends Component implements HasForms
 
     public function refreshComments(): void
     {
-        unset($this->comments, $this->totalCount, $this->hasMore);
+        unset($this->comments, $this->totalCount, $this->hasMore, $this->allCommentsCount);
     }
 
     public function render(): View
