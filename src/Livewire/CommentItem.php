@@ -19,10 +19,10 @@ use Relaticle\Comments\Events\CommentUpdated;
 use Relaticle\Comments\Mentions\MentionParser;
 use Relaticle\Comments\Models\Comment;
 
-class CommentItem extends Component implements HasForms, HasActions
+class CommentItem extends Component implements HasActions, HasForms
 {
-    use InteractsWithForms;
     use InteractsWithActions;
+    use InteractsWithForms;
     use WithFileUploads;
 
     public Comment $comment;
