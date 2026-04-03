@@ -172,7 +172,8 @@ it('preserves mention data attributes in comment body', function () {
     expect($comment->body)->toContain('data-type="mention"');
     expect($comment->body)->toContain('data-id="1"');
     expect($comment->body)->toContain('data-label="max"');
-    expect($comment->body)->toContain('data-char="@"');
+    expect($comment->body)->toMatch('/data-char="(?:@|&#64;)"/');
+
 });
 
 it('sanitizes content submitted through livewire component', function () {

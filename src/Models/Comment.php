@@ -25,10 +25,6 @@ class Comment extends Model
             $comment->body = app('comments.html_sanitizer')->sanitize($comment->body);
         });
 
-        static::deleting(function (self $comment): void {
-            $comment->replies()->each(fn ($reply) => $reply->delete());
-        });
-
         static::forceDeleting(function (self $comment): void {
             $comment->attachments()->delete();
             $comment->reactions()->delete();
@@ -152,7 +148,7 @@ class Comment extends Model
             $escapedName = e($name);
             $styledSpan = '<span class="comment-mention">@'.$escapedName.'</span>';
 
-            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>@?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/';
+            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>(?:@|&#64;)?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/';
 
             if (preg_match($pattern, $body)) {
                 $body = preg_replace($pattern, $styledSpan, $body);
