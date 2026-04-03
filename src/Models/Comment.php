@@ -148,7 +148,9 @@ class Comment extends Model
             $escapedName = e($name);
             $styledSpan = '<span class="comment-mention">@'.$escapedName.'</span>';
 
-            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>@?'.preg_quote($escapedName, '/').'<\/(?:span|a)>/';
+            // [^<]*? handles any encoding of @ the sanitizer may produce (e.g. @ or &#64;)
+            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>[^<]*?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/';
+
 
             if (preg_match($pattern, $body)) {
                 $body = preg_replace($pattern, $styledSpan, $body);
