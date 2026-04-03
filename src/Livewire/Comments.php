@@ -21,10 +21,10 @@ use Relaticle\Comments\Mentions\MentionParser;
 use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Models\Subscription;
 
-class Comments extends Component implements HasForms, HasActions
+class Comments extends Component implements HasActions, HasForms
 {
-    use InteractsWithForms;
     use InteractsWithActions;
+    use InteractsWithForms;
     use WithFileUploads;
 
     public Model $model;
