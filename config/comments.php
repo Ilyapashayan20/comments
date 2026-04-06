@@ -113,6 +113,13 @@ return [
         'tenant_column' => 'tenant_id',
 
         /*
+         | The database column type for the tenant identifier.
+         | Use 'unsignedBigInteger' for integer IDs (default),
+         | 'uuid' for UUID tenant keys, or 'string' for any other string-based key.
+         */
+        'tenant_column_type' => 'unsignedBigInteger',
+
+        /*
          | A callable that returns the current tenant's primary key (int|string|null).
          | Register it in a service provider:
          |

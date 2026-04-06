@@ -171,6 +171,11 @@ class CommentsConfig
         return (string) config('comments.multi_tenancy.tenant_column', 'tenant_id');
     }
 
+    public static function getTenantColumnType(): string
+    {
+        return (string) config('comments.multi_tenancy.tenant_column_type', 'unsignedBigInteger');
+    }
+
     public static function resolveTenantId(): int|string|null
     {
         $resolver = config('comments.multi_tenancy.tenant_resolver');
