@@ -38,4 +38,20 @@ class FeatureConfigurator
     {
         return in_array($feature, $this->enabled, true);
     }
+
+    /**
+     * Required for php artisan config:cache compatibility.
+     * Laravel uses var_export() to write the cached config file, which calls
+     * __set_state() when the cache is loaded. Without this method the cache
+     * command fails with a fatal error.
+     *
+     * @param array<string, mixed> $array
+     */
+    public static function __set_state(array $array): static
+    {
+        $instance = new static;
+        $instance->enabled = $array['enabled'] ?? [];
+
+        return $instance;
+    }
 }
