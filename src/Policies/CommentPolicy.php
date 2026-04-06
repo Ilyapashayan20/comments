@@ -35,9 +35,10 @@ class CommentPolicy
     /**
      * Verify the comment belongs to the currently active tenant.
      *
-     * When multi-tenancy is disabled, this always returns true so the existing
-     * ownership checks are the only gate. When enabled, a comment from another
-     * tenant must never pass authorisation even if the commenter IDs happen to match.
+     * When multi-tenancy is disabled, always returns true.
+     * When enabled and the resolver returns null: allows access in CLI/queue context,
+     * denies in web context (fail-closed — null resolver = misconfiguration).
+     * When enabled and a tenant ID is resolved: strict string comparison against the column.
      */
     private function belongsToCurrentTenant(Comment $comment): bool
     {
@@ -48,7 +49,9 @@ class CommentPolicy
         $tenantId = CommentsConfig::resolveTenantId();
 
         if ($tenantId === null) {
-            return true;
+            // CLI / queue workers have no active tenant — allow unrestricted access.
+            // In a web request a null resolver means misconfiguration — deny to fail closed.
+            return app()->runningInConsole();
         }
 
         $column = CommentsConfig::getTenantColumn();
