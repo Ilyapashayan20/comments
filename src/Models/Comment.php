@@ -11,11 +11,27 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Relaticle\Comments\CommentsConfig;
 use Relaticle\Comments\Database\Factories\CommentFactory;
+use Relaticle\Comments\Scopes\TenantScope;
 
 class Comment extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new TenantScope);
+
+        static::creating(function (self $comment): void {
+            if (CommentsConfig::isMultiTenancyEnabled()) {
+                $tenantId = CommentsConfig::resolveTenantId();
+
+                if ($tenantId !== null) {
+                    $comment->{CommentsConfig::getTenantColumn()} = $tenantId;
+                }
+            }
+        });
+    }
 
     protected static function boot(): void
     {

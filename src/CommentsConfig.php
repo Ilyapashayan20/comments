@@ -161,6 +161,32 @@ class CommentsConfig
         return (string) config('comments.polling.interval', '10s');
     }
 
+    public static function isMultiTenancyEnabled(): bool
+    {
+        return (bool) config('comments.multi_tenancy.enabled', false);
+    }
+
+    public static function getTenantColumn(): string
+    {
+        return (string) config('comments.multi_tenancy.tenant_column', 'tenant_id');
+    }
+
+    public static function resolveTenantId(): int|string|null
+    {
+        $resolver = config('comments.multi_tenancy.tenant_resolver');
+
+        if (! is_callable($resolver)) {
+            return null;
+        }
+
+        return call_user_func($resolver);
+    }
+
+    public static function resolveTenantUsing(callable $callback): void
+    {
+        config(['comments.multi_tenancy.tenant_resolver' => $callback]);
+    }
+
     public static function resolveAuthenticatedUser(): ?object
     {
         if (static::$resolveAuthenticatedUser) {

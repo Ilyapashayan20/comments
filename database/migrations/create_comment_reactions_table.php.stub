@@ -10,6 +10,9 @@ return new class extends Migration
     {
         Schema::create(config('comments.table_names.reactions', 'comment_reactions'), function (Blueprint $table) {
             $table->id();
+            if (config('comments.multi_tenancy.enabled', false)) {
+                $table->unsignedBigInteger(config('comments.multi_tenancy.tenant_column', 'tenant_id'))->nullable()->index();
+            }
             $table->foreignId('comment_id')
                 ->constrained(config('comments.table_names.comments', 'comments'))
                 ->cascadeOnDelete();

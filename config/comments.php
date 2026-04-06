@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Relaticle\Comments\FeatureSystem\FeatureConfigurator;
 use Relaticle\Comments\Mentions\DefaultMentionResolver;
 use Relaticle\Comments\Models\Comment;
 use Relaticle\Comments\Policies\CommentPolicy;
@@ -94,5 +95,32 @@ return [
 
     'polling' => [
         'interval' => '10s',
+    ],
+
+    /*
+     | Enable or disable optional package features.
+     | Reserved for future features — add cases from CommentsFeature enum here.
+     */
+    'features' => FeatureConfigurator::configure(),
+
+    'multi_tenancy' => [
+        'enabled' => false,
+
+        /*
+         | The column name that stores the tenant identifier on every comments table.
+         | Change this if your application uses a different column (e.g. team_id, org_id).
+         */
+        'tenant_column' => 'tenant_id',
+
+        /*
+         | A callable that returns the current tenant's primary key (int|string|null).
+         | Register it in a service provider:
+         |
+         |   CommentsConfig::resolveTenantUsing(fn () => Filament::getTenant()?->getKey());
+         |
+         | When null (or when the callable returns null), the scope is skipped entirely.
+         | This is intentional: CLI commands and queue workers run without an active tenant.
+         */
+        'tenant_resolver' => null,
     ],
 ];
