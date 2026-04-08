@@ -13,8 +13,9 @@ abstract class MultiTenancyTestCase extends TestCase
         parent::defineDatabaseMigrations();
 
         $column = config('comments.multi_tenancy.tenant_column', 'tenant_id');
+        $commentsTable = config('comments.table_names.comments', 'comments');
 
-        Schema::table('comments', function (Blueprint $table) use ($column) {
+        Schema::table($commentsTable, function (Blueprint $table) use ($column) {
             $table->unsignedBigInteger($column)->nullable()->index()->after('id');
         });
     }
