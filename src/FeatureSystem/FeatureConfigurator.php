@@ -50,7 +50,8 @@ class FeatureConfigurator
     public static function __set_state(array $array): static
     {
         $instance = new static;
-        $instance->enabled = $array['enabled'] ?? [];
+        $privateEnabledKey = "\0".static::class."\0enabled";
+        $instance->enabled = $array[$privateEnabledKey] ?? $array['enabled'] ?? [];
 
         return $instance;
     }
