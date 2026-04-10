@@ -128,6 +128,110 @@ public static function infolist(Infolist $infolist): Infolist
 
 **[View Complete Documentation ->](https://relaticle.github.io/comments/)**
 
+## Multi-tenancy
+
+This package has built-in support for multi-tenant applications. When enabled, every comment query is automatically scoped to the current tenant, and every new comment is stamped with the current tenant's ID.
+
+### How it works
+
+The package adds a `tenant_id` column (nullable, no foreign key) to all five database tables. A Laravel global scope — `TenantScope` — adds `WHERE tenant_id = ?` to every `Comment` query automatically, including those triggered through the `HasComments` trait. The `CommentPolicy` independently verifies tenant ownership on `update` and `delete`.
+
+### Step 1 — Publish and run migrations
+
+If you have already run the package migrations, you will need to add the `tenant_id` column manually via a new migration in your application:
+
+```php
+Schema::table('comments', function (Blueprint $table) {
+    $table->unsignedBigInteger('tenant_id')->nullable()->index()->after('id');
+});
+// Repeat for: comment_attachments, comment_mentions, comment_reactions, comment_subscriptions
+```
+
+New installations will get the column automatically from the published stubs.
+
+### Step 2 — Enable the feature in config
+
+Publish the config file if you haven't already:
+
+```bash
+php artisan vendor:publish --tag="comments-config"
+```
+
+Then set `enabled` to `true` in `config/comments.php`:
+
+```php
+'multi_tenancy' => [
+    'enabled' => true,
+
+    // Change this if your tenant column has a different name (e.g. team_id, org_id)
+    'tenant_column' => 'tenant_id',
+
+    // Leave null here — register the resolver in a service provider instead (see below)
+    'tenant_resolver' => null,
+],
+```
+
+### Step 3 — Register a tenant resolver
+
+The package does not know how your application determines the current tenant. You tell it by registering a closure that returns the current tenant's primary key (an `int`, a `string`, or `null`).
+
+Do this in a service provider — `AppServiceProvider::boot()` works well:
+
+```php
+use Relaticle\Comments\CommentsConfig;
+
+public function boot(): void
+{
+    CommentsConfig::resolveTenantUsing(function (): int|string|null {
+        // Return the current tenant's ID, or null if there is no active tenant.
+        // Returning null causes the scope to be skipped (safe for CLI / queue workers).
+        return auth()->user()?->team_id;
+    });
+}
+```
+
+### Example — Filament multi-tenancy
+
+Filament stores the active tenant in a singleton. Retrieve it with `Filament::getTenant()`:
+
+```php
+use Filament\Facades\Filament;
+use Relaticle\Comments\CommentsConfig;
+
+public function boot(): void
+{
+    CommentsConfig::resolveTenantUsing(fn () => Filament::getTenant()?->getKey());
+}
+```
+
+`Filament::getTenant()` returns `null` outside of a Filament panel request (e.g. during `php artisan` commands), so the scope is automatically skipped in those contexts — no special handling needed.
+
+### Example — Spatie Laravel-Multitenancy
+
+[Spatie Laravel-Multitenancy](https://spatie.be/docs/laravel-multitenancy) stores the current tenant in a static property on the `Tenant` model:
+
+```php
+use Spatie\Multitenancy\Models\Tenant;
+use Relaticle\Comments\CommentsConfig;
+
+public function boot(): void
+{
+    CommentsConfig::resolveTenantUsing(fn () => Tenant::current()?->getKey());
+}
+```
+
+`Tenant::current()` returns `null` when no tenant is active (landlord context, CLI), so the scope and policy tenant check are both skipped automatically.
+
+### Bypassing the scope when needed
+
+If you need to query across all tenants (e.g. in an admin panel or a console command), use `withoutGlobalScope`:
+
+```php
+use Relaticle\Comments\Scopes\TenantScope;
+
+Comment::withoutGlobalScope(TenantScope::class)->where('body', 'like', '%spam%')->delete();
+```
+
 ## Our Ecosystem
 
 <table>
