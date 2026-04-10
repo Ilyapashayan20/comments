@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.1.0 - 2026-04-10
+
+### What's Changed
+
+#### New Features
+
+* feat: implement multi-tenancy support with TenantScope, config flag, global scope, and policy checks
+* feat: add `tenant_column_type` config option to support UUID and string tenant keys in migrations
+* feat: add `FeatureConfigurator` and `CommentsFeature` enum for optional feature toggling
+
+#### Bug Fixes
+
+* fix: fail closed in `CommentPolicy` when tenant resolver returns null on web requests
+* fix: implement `__set_state` on `FeatureConfigurator` for `config:cache` compatibility
+* fix: remove unused `MULTI_TENANCY` case from `CommentsFeature` enum
+* fix: make mention regex robust to any `@` encoding from HTML sanitizer
+
+#### Documentation
+
+* docs: add multi-tenancy setup guide to README and docs site
+
+**Full Changelog**: https://github.com/relaticle/comments/compare/v1.0.0-alpha.4...v1.1.0
+
 ## v1.0.0-alpha.4 - 2026-03-31
 
 <!-- Release notes generated using configuration in .github/release.yml at 1.x -->
