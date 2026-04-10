@@ -2,6 +2,4 @@
 
 namespace Relaticle\Comments\Enums;
 
-enum CommentsFeature
-{
-}
+enum CommentsFeature {}
