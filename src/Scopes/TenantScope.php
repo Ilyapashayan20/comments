@@ -24,6 +24,11 @@ class TenantScope implements Scope
         $tenantId = CommentsConfig::resolveTenantId();
 
         if ($tenantId === null) {
+            if (app()->runningInConsole()) {
+                return;
+            }
+
+            $builder->whereRaw('1 = 0');
             return;
         }
 
