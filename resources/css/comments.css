@@ -1,3 +1,22 @@
+/* Prevent fi-modal-content from overflowing the slide-over window */
+.fi-modal-content:has(> .comments-wrap) {
+    overflow: hidden;
+}
+
+/* Fill the slide-over/modal content area and pin form to bottom */
+.fi-modal-content > .comments-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.comments-wrap > .comments-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
 .comment-mention {
     background-color: rgb(var(--primary-50));
     color: rgb(var(--primary-600));
