@@ -158,16 +158,19 @@ class Comment extends Model
     {
         $body = $this->body;
 
-        // Key by user ID so we can resolve the current name by data-id (stable identifier).
-        // This ensures renamed users are always shown with their current name.
         $mentionsById = $this->mentions->keyBy('id');
+        $handledIds = [];
 
-        return preg_replace_callback(
+        // Replace rich-editor mention spans by data-id (stable identifier, survives renames)
+        $body = preg_replace_callback(
             '/<(?:span|a)[^>]*data-type="mention"[^>]*>[^<]*<\/(?:span|a)>/',
-            function (array $matches) use ($mentionsById): string {
+            function (array $matches) use ($mentionsById, &$handledIds): string {
                 if (preg_match('/data-id=["\'](\d+)["\']/', $matches[0], $idMatch)) {
-                    $user = $mentionsById->get((int) $idMatch[1]);
+                    $id = (int) $idMatch[1];
+                    $user = $mentionsById->get($id);
                     if ($user !== null) {
+                        $handledIds[] = $id;
+
                         return '<span class="comment-mention">@'.e($user->name).'</span>';
                     }
                 }
@@ -176,5 +179,17 @@ class Comment extends Model
             },
             $body
         ) ?? $body;
+
+        // Fallback for plain-text @Name mentions (no data-id span available)
+        foreach ($this->mentions as $user) {
+            if (in_array($user->getKey(), $handledIds)) {
+                continue;
+            }
+            $styledSpan = '<span class="comment-mention">@'.e($user->name).'</span>';
+            $body = str_replace('&#64;'.$user->name, $styledSpan, $body);
+            $body = str_replace('@'.$user->name, $styledSpan, $body);
+        }
+
+        return $body;
     }
 }
