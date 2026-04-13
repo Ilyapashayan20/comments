@@ -60,7 +60,6 @@ class CommentsServiceProvider extends PackageServiceProvider
             fn (): HtmlSanitizer => new HtmlSanitizer(
                 (new HtmlSanitizerConfig)
                     ->allowSafeElements()
-                    ->dropElement('img')
                     ->allowRelativeLinks()
                     ->allowRelativeMedias()
                     ->allowAttribute('class', allowedElements: '*')

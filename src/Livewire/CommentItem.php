@@ -108,9 +108,19 @@ class CommentItem extends Component implements HasActions, HasForms
         $this->authorize('update', $this->comment);
 
         $data = $this->editForm->getState();
+        $body = $data['body'] ?? '';
+
+        // Strip the attachment <img> tags that were injected in startEdit() for display purposes.
+        // They are stored in comment_attachments, not in the body column.
+        foreach ($this->comment->attachments as $attachment) {
+            if ($attachment->isImage()) {
+                $escapedUrl = preg_quote(e($attachment->url()), '/');
+                $body = preg_replace('/<img[^>]*src=["\']'.$escapedUrl.'["\'][^>]*\/?>/i', '', $body);
+            }
+        }
 
         $this->comment->update([
-            'body' => $data['body'] ?? '',
+            'body' => $body,
             'edited_at' => now(),
         ]);
 
