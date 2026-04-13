@@ -171,7 +171,7 @@ class Comment extends Model
                     if ($user !== null) {
                         $handledIds[] = $id;
 
-                        return '<span class="bg-primary-50 text-primary-600 dark:bg-primary-400/10 dark:text-primary-400 px-2 py-0.5 rounded font-medium whitespace-nowrap">@'.e($user->name).'</span>';
+                        return '<span class="bg-primary-50 dark:bg-primary-400/10 text-primary-600  dark:text-primary-400 px-2 py-0.5 rounded font-medium whitespace-nowrap">@'.e($user->name).'</span>';
                     }
                 }
 
