@@ -1,21 +1,3 @@
-@once
-<style>
-.comment-mention {
-    background-color: rgb(var(--primary-50));
-    color: rgb(var(--primary-600));
-    border-radius: 0.25rem;
-    padding: 0 0.25rem;
-    display: inline-block;
-    font-weight: 500;
-    white-space: nowrap;
-}
-.dark .comment-mention {
-    background-color: rgb(var(--primary-400) / 0.1);
-    color: rgb(var(--primary-400));
-}
-</style>
-@endonce
-
 <div class="flex gap-3" wire:key="comment-item-{{ $comment->id }}">
     {{-- Avatar --}}
     <div class="shrink-0">
