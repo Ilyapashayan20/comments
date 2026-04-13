@@ -23,7 +23,7 @@ it('renders mention with styled span', function () {
 
     $rendered = $comment->renderBodyWithMentions();
 
-    expect($rendered)->toContain('fi-fo-rich-editor-mention');
+    expect($rendered)->toContain('comment-mention');
     expect($rendered)->toContain('@Alice</span>');
 });
 
@@ -48,7 +48,7 @@ it('renders multiple mentions with styled spans', function () {
 
     expect($rendered)->toContain('@Alice</span>');
     expect($rendered)->toContain('@Bob</span>');
-    expect($rendered)->toContain('fi-fo-rich-editor-mention');
+    expect($rendered)->toContain('comment-mention');
 });
 
 it('renders rich-editor mention span as styled mention', function () {
@@ -68,9 +68,9 @@ it('renders rich-editor mention span as styled mention', function () {
 
     $rendered = $comment->renderBodyWithMentions();
 
-    expect($rendered)->toContain('fi-fo-rich-editor-mention');
+    expect($rendered)->toContain('comment-mention');
     expect($rendered)->toContain('@Alice</span>');
-    expect($rendered)->toContain('contenteditable="false"');
+    expect($rendered)->not->toContain('data-type="mention"');
 });
 
 it('does not style non-mentioned @text', function () {
@@ -87,10 +87,10 @@ it('does not style non-mentioned @text', function () {
 
     $rendered = $comment->renderBodyWithMentions();
 
-    expect($rendered)->not->toContain('fi-fo-rich-editor-mention');
+    expect($rendered)->not->toContain('comment-mention');
 });
 
-it('renders fi-fo-rich-editor-mention class in Livewire component', function () {
+it('renders comment-mention class in Livewire component', function () {
     $user = User::factory()->create();
     $alice = User::factory()->create(['name' => 'Alice']);
     $post = Post::factory()->create();
@@ -108,5 +108,5 @@ it('renders fi-fo-rich-editor-mention class in Livewire component', function () 
     $this->actingAs($user);
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
-        ->assertSeeHtml('fi-fo-rich-editor-mention');
+        ->assertSeeHtml('comment-mention');
 });

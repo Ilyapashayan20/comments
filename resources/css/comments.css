@@ -17,8 +17,7 @@
     min-height: 0;
 }
 
-/* Style mention spans in comment body to match rich editor appearance */
-.fi-prose .fi-fo-rich-editor-mention {
+.comment-mention {
     background-color: rgb(var(--primary-50));
     color: rgb(var(--primary-600));
     margin-top: 0;
@@ -29,10 +28,10 @@
     padding-right: 0.25rem;
     font-weight: 500;
     white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.dark .fi-prose .fi-fo-rich-editor-mention {
+.dark .comment-mention {
     background-color: rgb(var(--primary-400) / 0.1);
     color: rgb(var(--primary-400));
 }
-
