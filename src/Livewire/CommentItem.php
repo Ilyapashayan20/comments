@@ -82,7 +82,18 @@ class CommentItem extends Component implements HasActions, HasForms
         $this->authorize('update', $this->comment);
 
         $this->isEditing = true;
-        $body = preg_replace('/<img[^>]*\/?>/i', '', $this->comment->body) ?? $this->comment->body;
+
+        $body = $this->comment->body;
+
+        // Append image attachments into the editor body so they're visible while editing.
+        // The sanitizer drops <img> on save, so they won't be persisted to the body column —
+        // they remain stored in the comment_attachments table.
+        foreach ($this->comment->attachments as $attachment) {
+            if ($attachment->isImage()) {
+                $body .= '<img src="'.e($attachment->url()).'" alt="'.e($attachment->original_name).'">';
+            }
+        }
+
         $this->editForm->fill(['body' => $body]);
     }
 
