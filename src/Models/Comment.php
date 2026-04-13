@@ -165,8 +165,8 @@ class Comment extends Model
         $body = preg_replace_callback(
             '/<(?:span|a)[^>]*data-type="mention"[^>]*>[^<]*<\/(?:span|a)>/',
             function (array $matches) use ($mentionsById, &$handledIds): string {
-                if (preg_match('/data-id=["\'](\d+)["\']/', $matches[0], $idMatch)) {
-                    $id = (int) $idMatch[1];
+                if (preg_match('/data-id=["\']([^"\']+)["\']/', $matches[0], $idMatch)) {
+                    $id = $idMatch[1];
                     $user = $mentionsById->get($id);
                     if ($user !== null) {
                         $handledIds[] = $id;

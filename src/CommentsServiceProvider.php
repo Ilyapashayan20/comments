@@ -5,6 +5,7 @@ namespace Relaticle\Comments;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\Facades\Route;
+use Relaticle\Comments\Http\Controllers\CommentsStyleController;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -89,11 +90,7 @@ class CommentsServiceProvider extends PackageServiceProvider
         Livewire::component('comment-item', CommentItem::class);
         Livewire::component('reactions', Reactions::class);
 
-        $cssPath = __DIR__.'/../resources/css/comments.css';
-
-        Route::get('/__relaticle-comments/css', static function () use ($cssPath) {
-            return response(file_get_contents($cssPath), 200, ['Content-Type' => 'text/css']);
-        });
+        Route::get('/__relaticle-comments/css', CommentsStyleController::class);
 
         FilamentAsset::register([
             Css::make('comments')->html(
