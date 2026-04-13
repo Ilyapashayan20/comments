@@ -158,25 +158,23 @@ class Comment extends Model
     {
         $body = $this->body;
 
-        $mentionNames = $this->mentions->pluck('name')->filter()->unique();
+        // Key by user ID so we can resolve the current name by data-id (stable identifier).
+        // This ensures renamed users are always shown with their current name.
+        $mentionsById = $this->mentions->keyBy('id');
 
-        foreach ($mentionNames as $name) {
-            $escapedName = e($name);
-            $styledSpan = '<span class="comment-mention">@'.$escapedName.'</span>';
+        return preg_replace_callback(
+            '/<(?:span|a)[^>]*data-type="mention"[^>]*>[^<]*<\/(?:span|a)>/',
+            function (array $matches) use ($mentionsById): string {
+                if (preg_match('/data-id=["\'](\d+)["\']/', $matches[0], $idMatch)) {
+                    $user = $mentionsById->get((int) $idMatch[1]);
+                    if ($user !== null) {
+                        return '<span class="comment-mention">@'.e($user->name).'</span>';
+                    }
+                }
 
-            // [^<]*? handles any encoding of @ the sanitizer may produce (e.g. @ or &#64;)
-            $pattern = '/<(?:span|a)[^>]*data-type="mention"[^>]*>[^<]*?' . preg_quote($escapedName, '/') . '<\/(?:span|a)>/';
-
-
-            if (preg_match($pattern, $body)) {
-                $body = preg_replace($pattern, $styledSpan, $body);
-            } else {
-                // Fallback for plain-text mentions
-                $body = str_replace("&#64;{$name}", $styledSpan, $body);
-                $body = str_replace("@{$name}", $styledSpan, $body);
-            }
-        }
-
-        return $body;
+                return $matches[0];
+            },
+            $body
+        ) ?? $body;
     }
 }
