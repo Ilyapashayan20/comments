@@ -23,7 +23,7 @@ it('renders mention with styled span', function () {
 
     $rendered = $comment->renderBodyWithMentions();
 
-    expect($rendered)->toContain('comment-mention');
+    expect($rendered)->toContain('bg-primary-50');
     expect($rendered)->toContain('@Alice</span>');
 });
 
@@ -48,7 +48,7 @@ it('renders multiple mentions with styled spans', function () {
 
     expect($rendered)->toContain('@Alice</span>');
     expect($rendered)->toContain('@Bob</span>');
-    expect($rendered)->toContain('comment-mention');
+    expect($rendered)->toContain('bg-primary-50');
 });
 
 it('renders rich-editor mention span as styled mention', function () {
@@ -68,7 +68,7 @@ it('renders rich-editor mention span as styled mention', function () {
 
     $rendered = $comment->renderBodyWithMentions();
 
-    expect($rendered)->toContain('comment-mention');
+    expect($rendered)->toContain('bg-primary-50');
     expect($rendered)->toContain('@Alice</span>');
     expect($rendered)->not->toContain('data-type="mention"');
 });
@@ -87,10 +87,10 @@ it('does not style non-mentioned @text', function () {
 
     $rendered = $comment->renderBodyWithMentions();
 
-    expect($rendered)->not->toContain('comment-mention');
+    expect($rendered)->not->toContain('bg-primary-50');
 });
 
-it('renders comment-mention class in Livewire component', function () {
+it('renders styled mention in Livewire component', function () {
     $user = User::factory()->create();
     $alice = User::factory()->create(['name' => 'Alice']);
     $post = Post::factory()->create();
@@ -108,5 +108,5 @@ it('renders comment-mention class in Livewire component', function () {
     $this->actingAs($user);
 
     Livewire::test(CommentItem::class, ['comment' => $comment])
-        ->assertSeeHtml('comment-mention');
+        ->assertSeeHtml('bg-primary-50');
 });

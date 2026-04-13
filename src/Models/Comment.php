@@ -171,7 +171,7 @@ class Comment extends Model
                     if ($user !== null) {
                         $handledIds[] = $id;
 
-                        return '<span class="comment-mention">@'.e($user->name).'</span>';
+                        return '<span class="bg-primary-50 text-primary-600 dark:bg-primary-400/10 dark:text-primary-400 px-2 py-0.5 rounded font-medium whitespace-nowrap">@'.e($user->name).'</span>';
                     }
                 }
 
@@ -185,7 +185,7 @@ class Comment extends Model
             if (in_array($user->getKey(), $handledIds)) {
                 continue;
             }
-            $styledSpan = '<span class="comment-mention">@'.e($user->name).'</span>';
+            $styledSpan = '<span class="bg-primary-50 text-primary-600 dark:bg-primary-400/10 dark:text-primary-400 px-2 py-0.5 rounded font-medium whitespace-nowrap">@'.e($user->name).'</span>';
             $body = str_replace('&#64;'.$user->name, $styledSpan, $body);
             $body = str_replace('@'.$user->name, $styledSpan, $body);
         }

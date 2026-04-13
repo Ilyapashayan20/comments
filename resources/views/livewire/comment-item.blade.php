@@ -1,4 +1,4 @@
-<div class="flex gap-3 mb-0 last:mb-4" wire:key="comment-item-{{ $comment->id }}">
+<div class="flex gap-3 mb-8" wire:key="comment-item-{{ $comment->id }}">
     {{-- Avatar --}}
     <div class="shrink-0">
         @if ($comment->trashed())

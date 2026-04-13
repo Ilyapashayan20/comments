@@ -17,21 +17,4 @@
     min-height: 0;
 }
 
-.comment-mention {
-    background-color: rgb(var(--primary-50));
-    color: rgb(var(--primary-600));
-    margin-top: 0;
-    margin-bottom: 0;
-    display: inline-block;
-    border-radius: 0.25rem;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    font-weight: 500;
-    white-space: nowrap;
-    transition: background-color 0.15s ease, color 0.15s ease;
-}
 
-.dark .comment-mention {
-    background-color: rgb(var(--primary-400) / 0.1);
-    color: rgb(var(--primary-400));
-}
