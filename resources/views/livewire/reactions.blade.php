@@ -34,11 +34,10 @@
         <div class="relative max-h-[22px]" x-data="{ open: $wire.entangle('showPicker') }">
             <button @click="open = !open" type="button" title="Add reaction"
                     class="inline-flex items-center rounded-full border border-dashed border-gray-300 bg-transparent px-2 py-0.5 text-xs text-gray-400 transition hover:border-gray-400 hover:text-gray-500 dark:border-gray-600 dark:text-gray-500 dark:hover:border-gray-500 dark:hover:text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 max-h-4">
-                <circle cx="10" cy="13.5" r="7"/>
-                <path stroke-width="2.5" d="M7.5 11.5h.01M12.5 11.5h.01"/>
-                <path d="M7.5 16a2.5 2.5 0 0 0 5 0"/>
-                <path d="M19.5 1.5v5M17 4h5"/>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                <circle cx="12" cy="12" r="9"/>
+                <path stroke-width="2.5" d="M9 9.5h.01M15 9.5h.01"/>
+                <path d="M9 14.5a3 3 0 0 0 6 0"/>
             </svg>
         </button>
             <div x-show="open" x-cloak @click.outside="open = false"

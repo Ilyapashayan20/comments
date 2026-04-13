@@ -1,3 +1,18 @@
+/* Mention chip — light + dark styles defined here so Tailwind purge never strips them */
+.comment-mention {
+    background-color: var(--primary-50);
+    color: var(--primary-600);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.dark .comment-mention {
+    background-color: color-mix(in oklab, var(--primary-400) 10%, transparent);
+    color: var(--primary-400);
+}
+
 /* Prevent fi-modal-content from overflowing the slide-over window */
 .fi-modal-content:has(> .comments-wrap) {
     overflow: hidden;
