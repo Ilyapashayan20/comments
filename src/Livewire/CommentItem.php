@@ -82,7 +82,8 @@ class CommentItem extends Component implements HasActions, HasForms
         $this->authorize('update', $this->comment);
 
         $this->isEditing = true;
-        $this->editForm->fill(['body' => $this->comment->body]);
+        $body = preg_replace('/<img[^>]*\/?>/i', '', $this->comment->body) ?? $this->comment->body;
+        $this->editForm->fill(['body' => $body]);
     }
 
     public function cancelEdit(): void

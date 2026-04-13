@@ -60,6 +60,7 @@ class CommentsServiceProvider extends PackageServiceProvider
             fn (): HtmlSanitizer => new HtmlSanitizer(
                 (new HtmlSanitizerConfig)
                     ->allowSafeElements()
+                    ->dropElement('img')
                     ->allowRelativeLinks()
                     ->allowRelativeMedias()
                     ->allowAttribute('class', allowedElements: '*')
@@ -70,8 +71,6 @@ class CommentsServiceProvider extends PackageServiceProvider
                     ->allowAttribute('data-label', allowedElements: 'span')
                     ->allowAttribute('data-char', allowedElements: 'span')
                     ->allowAttribute('style', allowedElements: '*')
-                    ->allowAttribute('width', allowedElements: 'img')
-                    ->allowAttribute('height', allowedElements: 'img')
                     ->withMaxInputLength(500000)
             ),
         );
