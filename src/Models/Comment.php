@@ -161,17 +161,28 @@ class Comment extends Model
         $mentionsById = $this->mentions->keyBy('id');
         $handledIds = [];
 
+        $mentionSpan = static function (int $id, string $displayName): string {
+            return '<span'
+                .' class="fi-fo-rich-editor-mention"'
+                .' data-type="mention"'
+                .' data-id="'.e($id).'"'
+                .' data-label="'.e($displayName).'"'
+                .' data-char="@"'
+                .' contenteditable="false"'
+                .'>@'.e($displayName).'</span>';
+        };
+
         // Replace rich-editor mention spans by data-id (stable identifier, survives renames)
         $body = preg_replace_callback(
             '/<(?:span|a)[^>]*data-type="mention"[^>]*>[^<]*<\/(?:span|a)>/',
-            function (array $matches) use ($mentionsById, &$handledIds): string {
+            function (array $matches) use ($mentionsById, &$handledIds, $mentionSpan): string {
                 if (preg_match('/data-id=["\'](\d+)["\']/', $matches[0], $idMatch)) {
                     $id = (int) $idMatch[1];
                     $user = $mentionsById->get($id);
                     if ($user !== null) {
                         $handledIds[] = $id;
 
-                        return '<span class="comment-mention">@'.e($user->name).'</span>';
+                        return $mentionSpan($id, $user->getCommentDisplayName());
                     }
                 }
 
@@ -185,9 +196,9 @@ class Comment extends Model
             if (in_array($user->getKey(), $handledIds)) {
                 continue;
             }
-            $styledSpan = '<span class="comment-mention">@'.e($user->name).'</span>';
-            $body = str_replace('&#64;'.$user->name, $styledSpan, $body);
-            $body = str_replace('@'.$user->name, $styledSpan, $body);
+            $styledSpan = $mentionSpan($user->getKey(), $user->getCommentDisplayName());
+            $body = str_replace('&#64;'.$user->getCommentDisplayName(), $styledSpan, $body);
+            $body = str_replace('@'.$user->getCommentDisplayName(), $styledSpan, $body);
         }
 
         return $body;
