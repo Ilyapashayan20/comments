@@ -29,6 +29,7 @@ class TenantScope implements Scope
             }
 
             $builder->whereRaw('1 = 0');
+
             return;
         }
 

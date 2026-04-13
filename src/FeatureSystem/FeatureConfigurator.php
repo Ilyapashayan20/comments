@@ -45,7 +45,7 @@ class FeatureConfigurator
      * __set_state() when the cache is loaded. Without this method the cache
      * command fails with a fatal error.
      *
-     * @param array<string, mixed> $array
+     * @param  array<string, mixed>  $array
      */
     public static function __set_state(array $array): static
     {
