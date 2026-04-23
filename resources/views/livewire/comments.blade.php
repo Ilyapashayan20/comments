@@ -45,17 +45,26 @@
 
     {{-- Pinned comments --}}
     @if (\Relaticle\Comments\CommentsConfig::isPinningEnabled() && $this->pinnedComments->isNotEmpty())
-        <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-900/20">
-            <div class="mb-2 flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-                <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.293 1.293a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 4.414V10a1 1 0 11-2 0V4.414L7.707 5.707a1 1 0 01-1.414-1.414l3-3z"/>
-                    <path d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
-                </svg>
-                Pinned ({{ $this->pinnedComments->count() }})
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            {{-- Header --}}
+            <div class="flex items-center justify-between border-b border-gray-100 px-4 py-2.5 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    {{-- Pushpin icon --}}
+                    <svg class="h-4 w-4 text-amber-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 3a1 1 0 0 1 .707.293l4 4a1 1 0 0 1-1.32 1.497l-1.094-.547-3.2 3.2.27 1.35a1 1 0 0 1-.27.92l-1 1a1 1 0 0 1-1.414 0L11 12.414l-3.293 3.293a1 1 0 0 1-1.414-1.414L9.586 11 7.987 9.401a1 1 0 0 1 0-1.414l1-1a1 1 0 0 1 .92-.27l1.35.27 3.2-3.2-.547-1.094A1 1 0 0 1 14 2.383V2a1 1 0 0 1 1-1h1z"/>
+                    </svg>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-gray-200">Pinned</span>
+                </div>
+                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                    {{ $this->pinnedComments->count() }}
+                </span>
             </div>
-            <div class="space-y-3">
+            {{-- Pinned comment list with dividers --}}
+            <div class="divide-y divide-gray-100 px-4 dark:divide-gray-700">
                 @foreach ($this->pinnedComments as $comment)
-                    <livewire:comment-item :comment="$comment" :key="'pinned-'.$comment->id" />
+                    <div class="py-2">
+                        <livewire:comment-item :comment="$comment" :key="'pinned-'.$comment->id" />
+                    </div>
                 @endforeach
             </div>
         </div>

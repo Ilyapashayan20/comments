@@ -29,10 +29,9 @@
                     <span class="text-xs text-gray-400 dark:text-gray-500">(edited)</span>
                 @endif
                 @if ($comment->isPinned())
-                    <span class="inline-flex items-center gap-0.5 rounded text-xs text-amber-600 dark:text-amber-400">
-                        <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.293 1.293a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 4.414V10a1 1 0 11-2 0V4.414L7.707 5.707a1 1 0 01-1.414-1.414l3-3z"/>
-                            <path d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                        <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 3a1 1 0 0 1 .707.293l4 4a1 1 0 0 1-1.32 1.497l-1.094-.547-3.2 3.2.27 1.35a1 1 0 0 1-.27.92l-1 1a1 1 0 0 1-1.414 0L11 12.414l-3.293 3.293a1 1 0 0 1-1.414-1.414L9.586 11 7.987 9.401a1 1 0 0 1 0-1.414l1-1a1 1 0 0 1 .92-.27l1.35.27 3.2-3.2-.547-1.094A1 1 0 0 1 14 2.383V2a1 1 0 0 1 1-1h1z"/>
                         </svg>
                         Pinned
                     </span>
@@ -129,12 +128,20 @@
                         @if (\Relaticle\Comments\CommentsConfig::canPin(auth()->user(), $comment))
                             @if ($comment->isPinned())
                                 <button wire:click="$parent.unpinComment({{ $comment->id }})" type="button"
-                                    class="text-xs text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300">
+                                    title="Unpin"
+                                    class="inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300">
+                                    <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M16 3a1 1 0 0 1 .707.293l4 4a1 1 0 0 1-1.32 1.497l-1.094-.547-3.2 3.2.27 1.35a1 1 0 0 1-.27.92l-1 1a1 1 0 0 1-1.414 0L11 12.414l-3.293 3.293a1 1 0 0 1-1.414-1.414L9.586 11 7.987 9.401a1 1 0 0 1 0-1.414l1-1a1 1 0 0 1 .92-.27l1.35.27 3.2-3.2-.547-1.094A1 1 0 0 1 14 2.383V2a1 1 0 0 1 1-1h1z"/>
+                                    </svg>
                                     Unpin
                                 </button>
                             @else
                                 <button wire:click="$parent.pinComment({{ $comment->id }})" type="button"
-                                    class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    title="Pin"
+                                    class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-amber-500 dark:text-gray-500 dark:hover:text-amber-400">
+                                    <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M16 3a1 1 0 0 1 .707.293l4 4a1 1 0 0 1-1.32 1.497l-1.094-.547-3.2 3.2.27 1.35a1 1 0 0 1-.27.92l-1 1a1 1 0 0 1-1.414 0L11 12.414l-3.293 3.293a1 1 0 0 1-1.414-1.414L9.586 11 7.987 9.401a1 1 0 0 1 0-1.414l1-1a1 1 0 0 1 .92-.27l1.35.27 3.2-3.2-.547-1.094A1 1 0 0 1 14 2.383V2a1 1 0 0 1 1-1h1z"/>
+                                    </svg>
                                     Pin
                                 </button>
                             @endif
