@@ -28,6 +28,15 @@
                 @if ($comment->isEdited())
                     <span class="text-xs text-gray-400 dark:text-gray-500">(edited)</span>
                 @endif
+                @if ($comment->isPinned())
+                    <span class="inline-flex items-center gap-0.5 rounded text-xs text-amber-600 dark:text-amber-400">
+                        <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.293 1.293a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 4.414V10a1 1 0 11-2 0V4.414L7.707 5.707a1 1 0 01-1.414-1.414l3-3z"/>
+                            <path d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                        Pinned
+                    </span>
+                @endif
             </div>
 
             {{-- Body or edit form --}}
@@ -115,6 +124,22 @@
                             Delete
                         </button>
                     @endcan
+
+                    @auth
+                        @if (\Relaticle\Comments\CommentsConfig::canPin(auth()->user(), $comment))
+                            @if ($comment->isPinned())
+                                <button wire:click="$parent.unpinComment({{ $comment->id }})" type="button"
+                                    class="text-xs text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300">
+                                    Unpin
+                                </button>
+                            @else
+                                <button wire:click="$parent.pinComment({{ $comment->id }})" type="button"
+                                    class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    Pin
+                                </button>
+                            @endif
+                        @endif
+                    @endauth
                 @endauth
             </div>
         @endif

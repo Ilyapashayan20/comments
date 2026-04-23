@@ -43,6 +43,24 @@
         @endauth
     </div>
 
+    {{-- Pinned comments --}}
+    @if (\Relaticle\Comments\CommentsConfig::isPinningEnabled() && $this->pinnedComments->isNotEmpty())
+        <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-900/20">
+            <div class="mb-2 flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.293 1.293a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 4.414V10a1 1 0 11-2 0V4.414L7.707 5.707a1 1 0 01-1.414-1.414l3-3z"/>
+                    <path d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                </svg>
+                Pinned ({{ $this->pinnedComments->count() }})
+            </div>
+            <div class="space-y-3">
+                @foreach ($this->pinnedComments as $comment)
+                    <livewire:comment-item :comment="$comment" :key="'pinned-'.$comment->id" />
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- Comment list --}}
     <div class="space-y-4">
         @foreach ($this->comments as $comment)
