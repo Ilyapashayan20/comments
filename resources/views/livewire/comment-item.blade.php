@@ -28,11 +28,6 @@
                 @if ($comment->isEdited())
                     <span class="text-xs text-gray-400 dark:text-gray-500">(edited)</span>
                 @endif
-                @if ($comment->isPinned())
-                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-                        Pinned
-                    </span>
-                @endif
             </div>
 
             {{-- Body or edit form --}}
