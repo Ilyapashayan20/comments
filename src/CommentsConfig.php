@@ -273,7 +273,7 @@ class CommentsConfig
             return (bool) call_user_func(static::$authorizePin, $user, $comment);
         }
 
-        return Gate::allows('pin', $comment);
+        return Gate::forUser($user)->allows('pin', $comment);
     }
 
     public static function makeMentionProvider(): MentionProvider
