@@ -223,6 +223,8 @@ class Comments extends Component implements HasActions, HasForms
             $listeners["{$channel},CommentUpdated"] = 'refreshComments';
             $listeners["{$channel},CommentDeleted"] = 'refreshComments';
             $listeners["{$channel},CommentReacted"] = 'refreshComments';
+            $listeners["{$channel},CommentPinned"] = 'refreshComments';
+            $listeners["{$channel},CommentUnpinned"] = 'refreshComments';
         }
 
         return $listeners;
@@ -230,8 +232,12 @@ class Comments extends Component implements HasActions, HasForms
 
     public function pinComment(int $commentId): void
     {
-        $comment = CommentsConfig::getCommentModel()::findOrFail($commentId);
+        $comment = $this->model->topLevelComments()->find($commentId);
         $user = CommentsConfig::resolveAuthenticatedUser();
+
+        if (! $comment) {
+            return;
+        }
 
         if (! $user || ! CommentsConfig::canPin($user, $comment)) {
             return;
@@ -250,8 +256,12 @@ class Comments extends Component implements HasActions, HasForms
 
     public function unpinComment(int $commentId): void
     {
-        $comment = CommentsConfig::getCommentModel()::findOrFail($commentId);
+        $comment = $this->model->topLevelComments()->find($commentId);
         $user = CommentsConfig::resolveAuthenticatedUser();
+
+        if (! $comment) {
+            return;
+        }
 
         if (! $user || ! CommentsConfig::canPin($user, $comment)) {
             return;
